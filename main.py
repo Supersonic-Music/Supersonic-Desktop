@@ -1,4 +1,5 @@
-import json, curses, requests
+import json, curses, requests, subprocess, wget
+import mimetypes
 
 MUSIC_DIR = "http://localhost:8083/music"
 CAL_DIR = ".cal_sonic_library"
@@ -42,5 +43,10 @@ if __name__ == "__main__":
     songs_list = load_songs(artist_name, album_name_fr)
     list_stuff(songs_list)
     song_name = input("Choose a song: ")
-    import subprocess
-    subprocess.run(f"mplayer '{MUSIC_DIR}/{artist_name}/{album_name_fr}/{song_name}'" ,shell=True)
+    if mimetypes.mimetypes_list[song_name.split('.')[1]] == "f3d":
+        url = f"{MUSIC_DIR}/{artist_name}/{album_name_fr}/{song_name}"
+        directory = f".paperback_cache/{song_name}"
+        wget.download(url, out=directory)
+        subprocess.run(f"f3d .paperback_cache/{song_name}'", shell=True)
+    else:
+        subprocess.run(f"{mimetypes.mimetypes_list[song_name.split('.')[1]]} '{MUSIC_DIR}/{artist_name}/{album_name_fr}/{song_name}'", shell=True)
