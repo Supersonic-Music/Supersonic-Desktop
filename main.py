@@ -1,67 +1,46 @@
-import json
-import curses
-import os
+import json, curses, requests
 
-MUSIC_DIR = "/home/deck/Music"
+MUSIC_DIR = "http://localhost:8083/music"
 CAL_DIR = ".cal_sonic_library"
 
-# Load the list of artists
-with open(f"{MUSIC_DIR}/{CAL_DIR}/meta/artists.json", "r") as file:
-    artists_list = json.load(file)
+def load_artists():
+    url = f"{MUSIC_DIR}/{CAL_DIR}/meta/artists.json"
 
-def load_artist_data(artist_name):
-    artist_file = os.path.join(MUSIC_DIR, CAL_DIR, "artists", f"{artist_name}.json")
-    if os.path.isfile(artist_file):
-        with open(artist_file, "r") as file:
-            return json.load(file)
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        artists_list = response.json()
+        return artists_list
     else:
-        return []
+        return f"Error: {str(response.status_code)}"
 
-def main(stdscr):
-    curses.curs_set(0)  # Hide the cursor
-    stdscr.clear()
+def load_albums(artist_name):
+    url = f"{MUSIC_DIR}/{CAL_DIR}/albums/{artist_name}_albums.json"
+    response = requests.get(url)
+    albums_list = response.json()
+    return albums_list
 
-    height, width = stdscr.getmaxyx()
-    start_row = 0
-    selected_row = 0
+def load_songs(artist_name, album_name):
+    url = f"{MUSIC_DIR}/{CAL_DIR}/songs/{artist_name}_{album_name}_songs.json"
+    response = requests.get(url)
+    songs_list = response.json()
+    return songs_list
 
-    while True:
-        stdscr.clear()
+def list_stuff(list_of_stuff):
+    for thing in list_of_stuff:
+        print(thing["name"])
 
-        for i in range(start_row, min(start_row + height, len(artists_list))):
-            artist = artists_list[i]
-            if i - start_row == selected_row:
-                stdscr.addstr(i - start_row, 0, artist["name"], curses.A_REVERSE)
-            else:
-                stdscr.addstr(i - start_row, 0, artist["name"])
-
-        stdscr.refresh()
-
-        key = stdscr.getch()
-
-        if key == curses.KEY_DOWN and selected_row < height - 1:
-            selected_row += 1
-        elif key == curses.KEY_UP and selected_row > 0:
-            selected_row -= 1
-        elif key == curses.KEY_DOWN and selected_row == height - 1 and start_row < len(artists_list) - height:
-            start_row += 1
-        elif key == curses.KEY_UP and selected_row == 0 and start_row > 0:
-            start_row -= 1
-        elif key == ord('q'):
-            break
-        elif key == 10:  # Enter key
-            selected_artist = artists_list[selected_row + start_row]
-            artist_name = selected_artist["name"]
-            artist_data = load_artist_data(artist_name)
-            
-            # Create a new curses window to display the artist's data
-            artist_data_window = curses.newwin(height, width, 0, 0)
-            artist_data_window.clear()
-            
-            for i, data_item in enumerate(artist_data):
-                artist_data_window.addstr(i, 0, data_item)
-            
-            artist_data_window.refresh()
-            artist_data_window.getch()
-
-curses.wrapper(main)
+if __name__ == "__main__":
+    artists_list = load_artists()
+    list_stuff(artists_list)
+    artist_name = input("Choose an artist: ")
+    albums_list = load_albums(artist_name)
+    list_stuff(albums_list)
+    album_name_fr = input("Choose an album: ")
+    # album_name_fr = albums_list[int(album_name) - 1]
+    print(album_name_fr)
+    songs_list = load_songs(artist_name, album_name_fr)
+    list_stuff(songs_list)
+    song_name = input("Choose a song: ")
+    import subprocess
+    subprocess.run(f"mplayer '{MUSIC_DIR}/{artist_name}/{album_name_fr}/{song_name}'" ,shell=True)
