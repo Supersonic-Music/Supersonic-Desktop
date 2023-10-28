@@ -26,7 +26,7 @@ class App(customtkinter.CTk):
                                                      dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(20, 20))
 
         # create navigation frame
-        self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=0)
+        self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=25)
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
         self.navigation_frame.grid_rowconfigure(4, weight=1)
 
@@ -84,19 +84,19 @@ class App(customtkinter.CTk):
 
         def song_pressed(artist, album, song):
             from main import MUSIC_DIR
-            command = f"mplayer '{MUSIC_DIR}/{artist}/{album['name']}/{song['name']}'"
+            command = f'mplayer "{MUSIC_DIR}/{artist}/{album}/{song["name"]}"'
             print(command)
             subprocess.run("killall mplayer", shell=True)
             subprocess.Popen(command, shell=True)
 
         def album_pressed(artist_name, album_name):
-            print(f"Button pressed for artist: {album_name}")
+            print(f"Button pressed for album: {album_name}")
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
             back_button = customtkinter.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", command=lambda: back_to_albums(artist_name))
             back_button.grid(row=0)
             from main import load_album_songs
-            songs_list = load_album_songs(artist_name, album_name['name'])
+            songs_list = load_album_songs(artist_name, album_name)
             row = 1
             for song in songs_list:
                 print("Got from Sonic Screwdriver: Song - " + song["name"])
@@ -113,11 +113,7 @@ class App(customtkinter.CTk):
             from main import load_artist_albums
             albums_list = load_artist_albums(artist_name)
             row = 1
-            for album in albums_list:
-                print("Got from Sonic Screwdriver: Album - " + album["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.home_image, command=lambda album_name=album['name']: album_pressed(artist_name, album))
-                button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                row += 1
+            list_albums(artist_name)
         
         def back_to_albums(artist_name):
             for widget in self.home_frame.grid_slaves():
@@ -145,7 +141,7 @@ class App(customtkinter.CTk):
             albums_list = load_artist_albums(artist_name)
             for album in albums_list:
                 print("Got from Sonic Screwdriver: Album - " + album["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.home_image, command=lambda album_name=album['name']: album_pressed(artist_name, album))
+                button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.home_image, command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
 
