@@ -1,5 +1,6 @@
-import customtkinter, os, subprocess
+import customtkinter, os, subprocess, mimetypes, requests
 from PIL import Image
+from io import BytesIO
 
 
 class App(customtkinter.CTk):
@@ -22,6 +23,7 @@ class App(customtkinter.CTk):
                                                  dark_image=Image.open(os.path.join(image_path, "artist_light.png")), size=(20, 20))
         self.chat_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "album_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "album_light.png")), size=(20, 20))
+        self.album_placeholder = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "album_light.png")),size=(60, 60))
         self.add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "song_dark.png")),
                                                      dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(20, 20))
 
@@ -60,6 +62,8 @@ class App(customtkinter.CTk):
 
         # create home frame
         self.home_frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
+        self.home_frame.bind_all("<Button-4>", lambda e: self.home_frame._parent_canvas.yview("scroll", -1, "units"))
+        self.home_frame.bind_all("<Button-5>", lambda e: self.home_frame._parent_canvas.yview("scroll", 1, "units"))
         self.home_frame.grid_columnconfigure(0, weight=1)
 
         # stuff
@@ -84,9 +88,12 @@ class App(customtkinter.CTk):
 
         def song_pressed(artist, album, song):
             from main import MUSIC_DIR
-            command = f'mplayer "{MUSIC_DIR}/{artist}/{album}/{song["name"]}"'
+            player = f'{mimetypes.mimetypes_list[song["name"].split(".")[1]]}'
+            command = f'{player} "{MUSIC_DIR}/{artist}/{album}/{song["name"]}"'
             print(command)
-            subprocess.run("killall mplayer", shell=True)
+            if player == "mplayer" or player == "mpv":
+                subprocess.run("killall mplayer", shell=True)
+                subprocess.run("killall mpv", shell=True)
             subprocess.Popen(command, shell=True)
 
         def album_pressed(artist_name, album_name):
@@ -100,7 +107,7 @@ class App(customtkinter.CTk):
             row = 1
             for song in songs_list:
                 print("Got from Sonic Screwdriver: Song - " + song["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{song['name']}", image=self.home_image, command=lambda song=song: song_pressed(artist_name, album_name, song))
+                button = customtkinter.CTkButton(self.home_frame, text=f"{song['name']}", image=self.add_user_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
         
@@ -109,7 +116,7 @@ class App(customtkinter.CTk):
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
             back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
-            back_button.grid(row=0)
+            back_button.grid(row=0, pady=5)
             from main import load_artist_albums
             albums_list = load_artist_albums(artist_name)
             row = 1
@@ -129,19 +136,28 @@ class App(customtkinter.CTk):
             row = 2
             for artist in artists_list:
                 print("Got from Sonic Screwdriver: Artist - " + artist["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
 
         def list_albums(artist_name):
             back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
-            back_button.grid(row=0)
+            back_button.grid(row=0, pady=5)
             row = 1
             from main import load_artist_albums
             albums_list = load_artist_albums(artist_name)
             for album in albums_list:
                 print("Got from Sonic Screwdriver: Album - " + album["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.home_image, command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
+                from main import MUSIC_DIR
+                image_url = f"{MUSIC_DIR}/{artist_name}/{album['name']}/cover.jpg"
+                response = requests.get(image_url)
+                if response.status_code == 200:
+                    image = Image.open(BytesIO(response.content))
+                    self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                else:
+                    print("Failed to fetch the album art. Status code:", response.status_code)
+                    self.album_image = self.album_placeholder
+                button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
 
