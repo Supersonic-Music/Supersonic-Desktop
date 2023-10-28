@@ -3,6 +3,7 @@ audio_player = "mplayer"
 _3d_Viewer = "f3d"
 image_viewer = "gwenview"
 text_viewer = "kate"
+python_exec = "python"
 
 mimetypes_list = {
     "mp3": audio_player,
@@ -21,7 +22,7 @@ mimetypes_list = {
     "glb": _3d_Viewer,
     "usd": _3d_Viewer,
     "txt": text_viewer,
-    "py": text_viewer,
+    "py": python_exec,
     "json": text_viewer,
     "png": image_viewer,
     "jpg": image_viewer,

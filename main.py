@@ -34,15 +34,18 @@ def load_albums():
     for artist in artists_list:
         albums_list = load_artist_albums(artist_name=artist["name"])
         all_albums.append(albums_list)
-    return all_albums
+
+    all_albums_list = []
+    for item in all_albums:
+        for album in item:
+            if 'name' in album:
+                all_albums_list.append(album['name'])
+    return all_albums_list
+
 
 def list_stuff(list_of_stuff):
     for thing in list_of_stuff:
         print(thing["name"])
-
-all_albums = load_albums()
-for album in all_albums:
-    print(album)
 
 # if __name__ == "__main__":
 #     artists_list = load_artists()
