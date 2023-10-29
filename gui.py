@@ -27,6 +27,7 @@ class App(customtkinter.CTk):
         self.add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "song_dark.png")),
                                                      dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(20, 20))
         self.song_placeholder = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(30, 30))
+        self.plugin = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "plugin_light.png")), size=(20, 20))
 
         # create navigation frame
         self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=25)
@@ -87,10 +88,12 @@ class App(customtkinter.CTk):
         searchbox.configure(state="normal")  # configure textbox to be read-only
         row = 2
 
-        def song_pressed(artist, album, song):
+        def song_pressed(artist, album, song, songs_list):
             from main import MUSIC_DIR
             player = f'{mimetypes.mimetypes_list[song["name"].rsplit(".", 1)[-1]]}'
-            command = f'{player} "{MUSIC_DIR}/{artist}/{album}/{song["name"]}"'
+            command = f'{player}'
+            for song_name in songs_list:
+                command = command + f' "{MUSIC_DIR}/{artist}/{album}/{song_name}"'
             print(command)
             if player == "mplayer" or player == "mpv":
                 subprocess.run("killall mplayer", shell=True)
@@ -101,7 +104,7 @@ class App(customtkinter.CTk):
             print(f"Button pressed for album: {album_name}")
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
-            if artist_name == "Plugins":
+            if artist_name == ".Plugins":
                 back_button = customtkinter.CTkButton(self.home_frame, text=f"Back to Plugin Selection", command=lambda: back_to_albums(artist_name))
             else:
                 back_button = customtkinter.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", command=lambda: back_to_albums(artist_name))
@@ -135,9 +138,11 @@ class App(customtkinter.CTk):
                 else:
                     print(f"Failed to fetch the album art for {album_name}. Status code:", response.status_code)
                     self.song_image = self.song_placeholder
+            songs_list_fr = []
             for song in songs_list:
                 print("Got from Sonic Screwdriver: Song - " + song["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song))
+                songs_list_fr.append(song['name'])
+                button = customtkinter.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
         
@@ -148,15 +153,13 @@ class App(customtkinter.CTk):
             back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
             back_button.grid(row=0, pady=5)
             from main import load_artist_albums
-            albums_list = load_artist_albums(artist_name)
-            artist_text = customtkinter.CTkLabel(self.home_frame, text=artist_name, anchor="w")
-            artist_text.grid(row=1)
-            row = 2
+            artist_name_text(artist_name)
             list_albums(artist_name)
         
         def back_to_albums(artist_name):
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
+            artist_name_text(artist_name)
             list_albums(artist_name)
 
         def back_to_artists():
@@ -175,7 +178,7 @@ class App(customtkinter.CTk):
             for artist in artists_list:
                 if artist["name"] == ".Plugins":
                     print("Detected Plugins Directory!")
-                    button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.home_image, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                    button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
             for artist in artists_list:
@@ -183,6 +186,14 @@ class App(customtkinter.CTk):
                 button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
+
+        def artist_name_text(artist_name):
+            if artist_name == ".Plugins":
+                artist_text = customtkinter.CTkLabel(self.home_frame, text="Sonic Screwdriver Plugins", anchor="w")
+            else:
+                artist_text = customtkinter.CTkLabel(self.home_frame, text=artist_name, anchor="w")
+            artist_text.grid(row=1)
+            row = 2
 
         def list_albums(artist_name):
             back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
