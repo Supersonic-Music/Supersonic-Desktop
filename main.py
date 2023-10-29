@@ -16,9 +16,17 @@ def load_artists():
         return [f"Error: {str(response.status_code)}"]
 
 def load_artist_albums(artist_name: str):
-    url = f"{MUSIC_DIR}/{CAL_DIR}/albums/{artist_name}_albums.json"
-    response = requests.get(url)
-    albums_list = response.json()
+    if artist_name == "Plugins":
+        artists_list = load_artists()
+        albums_list = []
+        for artist in artists_list:
+            if artist["name"].endswith(".sonic"):
+                albums_list.append(artist)
+    else:
+        url = f"{MUSIC_DIR}/{CAL_DIR}/albums/{artist_name}_albums.json"
+        response = requests.get(url)
+        print(url)
+        albums_list = response.json()
     return albums_list
 
 def load_album_songs(artist_name: str, album_name: str):
