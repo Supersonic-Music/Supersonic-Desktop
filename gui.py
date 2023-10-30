@@ -28,6 +28,7 @@ class App(customtkinter.CTk):
                                                      dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(20, 20))
         self.song_placeholder = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(30, 30))
         self.plugin = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "plugin_light.png")), size=(20, 20))
+        self.playlist = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "playlist_light.png")), size=(20, 20))
 
         # create navigation frame
         self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=25)
@@ -228,8 +229,13 @@ class App(customtkinter.CTk):
                         button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                         button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                         row += 1
+                if artist["name"] == "Playlists":
+                    print("Detected Playlists!")
+                    button = customtkinter.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                    button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                    row += 1
             for artist in artists_list:
-                if artist["name"].startswith("."):
+                if artist["name"].startswith(".") or artist["name"] == "Playlists":
                     continue
                 print("Got from Sonic Screwdriver: Artist - " + artist["name"])
                 button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
