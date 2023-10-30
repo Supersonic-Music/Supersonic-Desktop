@@ -222,13 +222,15 @@ class App(customtkinter.CTk):
             found_plugins = False
             for artist in artists_list:
                 if artist["name"].endswith(".sonic"):
+                    print("Detected Plugin!")
                     if not found_plugins:
                         found_plugins = True
-                        print("Detected Plugin!")
                         button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                         button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                         row += 1
             for artist in artists_list:
+                if artist["name"].startswith("."):
+                    continue
                 print("Got from Sonic Screwdriver: Artist - " + artist["name"])
                 button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
