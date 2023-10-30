@@ -90,7 +90,7 @@ class App(customtkinter.CTk):
 
         def song_pressed(artist, album, song, songs_list):
             from main import MUSIC_DIR
-            player = f'{mimetypes.mimetypes_list[song["name"].rsplit(".", 1)[-1]]}'
+            player = mimetypes.mimetypes_list[song["name"].rsplit(".", 1)[-1]]
             if artist == "Plugins":
                 command = f'{player} "{MUSIC_DIR}/.{album}.sonic/{song["name"]}"'
             else:
