@@ -224,7 +224,7 @@ class App(customtkinter.CTk):
                 if artist["name"].endswith(".sonic"):
                     if not found_plugins:
                         found_plugins = True
-                        print("Detected YouTube Music Plugin!")
+                        print("Detected Plugin!")
                         button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                         button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                         row += 1
