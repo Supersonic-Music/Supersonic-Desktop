@@ -62,6 +62,14 @@ class App(customtkinter.CTk):
         self.appearance_mode_menu = customtkinter.CTkOptionMenu(self.navigation_frame, values=["System", "Dark", "Light"],
                                                                 command=self.change_appearance_mode_event)
         self.appearance_mode_menu.grid(row=6, column=0, padx=20, pady=20, sticky="s")
+        self.shuffle_box_var = customtkinter.StringVar(value="on")
+        self.shuffle_box = customtkinter.CTkCheckBox(self.navigation_frame, text="Shuffle Play", command=self.shuffle_play(),
+                                     variable=self.shuffle_box_var, onvalue="on", offvalue="off")
+        self.shuffle_box.grid(row=5, column=0, padx=20, pady=20, sticky="s")
+        self.repeat_box_var = customtkinter.StringVar(value="off")
+        self.repeat_box = customtkinter.CTkCheckBox(self.navigation_frame, text="Repeat Track", command=self.shuffle_play(),
+                                     variable=self.repeat_box_var, onvalue="on", offvalue="off")
+        self.repeat_box.grid(row=4, column=0, padx=20, pady=20, sticky="s")
 
         # create home frame
         self.home_frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
@@ -342,6 +350,9 @@ class App(customtkinter.CTk):
 
     def change_appearance_mode_event(self, new_appearance_mode):
         customtkinter.set_appearance_mode(new_appearance_mode)
+
+    def shuffle_play(new_state):
+        pass
 
 
 if __name__ == "__main__":
