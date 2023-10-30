@@ -265,6 +265,7 @@ class App(customtkinter.CTk):
                     image = Image.open(BytesIO(response.content))
                     self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                 else:
+                    print(f"Failed to get PNG: {image_url}.png - Trying JPG instead")
                     response = requests.get(image_url + ".jpg")
                     if response.status_code == 200:
                         image = Image.open(BytesIO(response.content))
