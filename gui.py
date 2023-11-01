@@ -1,9 +1,10 @@
-import customtkinter, os, subprocess, mimetypes, requests
+import os, subprocess, mimetypes, requests
+import customtkinter as ctk
 from PIL import Image
 from io import BytesIO
 
 
-class App(customtkinter.CTk):
+class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
@@ -16,63 +17,63 @@ class App(customtkinter.CTk):
 
         # load images with light and dark mode image
         image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
-        self.logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
-        self.large_test_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "large_test_image.png")), size=(500, 150))
-        self.image_icon_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
-        self.home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "artist_dark.png")),
+        self.logo_image = ctk.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
+        self.large_test_image = ctk.CTkImage(Image.open(os.path.join(image_path, "large_test_image.png")), size=(500, 150))
+        self.image_icon_image = ctk.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
+        self.home_image = ctk.CTkImage(light_image=Image.open(os.path.join(image_path, "artist_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "artist_light.png")), size=(20, 20))
-        self.chat_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "album_dark.png")),
+        self.chat_image = ctk.CTkImage(light_image=Image.open(os.path.join(image_path, "album_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "album_light.png")), size=(20, 20))
-        self.album_placeholder = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "album_light.png")),size=(60, 60))
-        self.add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "song_dark.png")),
+        self.album_placeholder = ctk.CTkImage(light_image=Image.open(os.path.join(image_path, "album_light.png")),size=(60, 60))
+        self.add_user_image = ctk.CTkImage(light_image=Image.open(os.path.join(image_path, "song_dark.png")),
                                                      dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(20, 20))
-        self.song_placeholder = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(30, 30))
-        self.plugin = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "plugin_light.png")), size=(20, 20))
-        self.playlist = customtkinter.CTkImage(dark_image=Image.open(os.path.join(image_path, "playlist_light.png")), size=(20, 20))
+        self.song_placeholder = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(30, 30))
+        self.plugin = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "plugin_light.png")), size=(20, 20))
+        self.playlist = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "playlist_light.png")), size=(20, 20))
 
         # create navigation frame
-        self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=25)
+        self.navigation_frame = ctk.CTkFrame(self, corner_radius=25)
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
         self.navigation_frame.grid_rowconfigure(4, weight=1)
 
-        self.navigation_frame_label = customtkinter.CTkLabel(self.navigation_frame, text="  Paperback", image=self.logo_image,
-                                                             compound="left", font=customtkinter.CTkFont(size=15, weight="bold"))
+        self.navigation_frame_label = ctk.CTkLabel(self.navigation_frame, text="  Paperback", image=self.logo_image,
+                                                             compound="left", font=ctk.CTkFont(size=15, weight="bold"))
         self.navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
 
-        self.home_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Artists",
+        self.home_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Artists",
                                                    fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                    image=self.home_image, anchor="w", command=self.home_button_event)
         self.home_button.grid(row=1, column=0, sticky="ew")
 
-        self.frame_2_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Albums",
+        self.frame_2_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Albums",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                       image=self.chat_image, anchor="w", command=self.frame_2_button_event)
         self.frame_2_button.grid(row=2, column=0, sticky="ew")
 
-        self.frame_3_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Songs",
+        self.frame_3_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Songs",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                       image=self.add_user_image, anchor="w", command=self.frame_3_button_event)
         self.frame_3_button.grid(row=3, column=0, sticky="ew")
 
-        self.frame_4_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Songs",
+        self.frame_4_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Songs",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                       image=self.add_user_image, anchor="w", command=self.frame_3_button_event)
         self.frame_4_button.grid(row=3, column=0, sticky="ew")
 
-        self.appearance_mode_menu = customtkinter.CTkOptionMenu(self.navigation_frame, values=["System", "Dark", "Light"],
+        self.appearance_mode_menu = ctk.CTkOptionMenu(self.navigation_frame, values=["System", "Dark", "Light"],
                                                                 command=self.change_appearance_mode_event)
         self.appearance_mode_menu.grid(row=6, column=0, padx=20, pady=20, sticky="s")
-        self.shuffle_box_var = customtkinter.StringVar(value="on")
-        self.shuffle_box = customtkinter.CTkCheckBox(self.navigation_frame, text="Shuffle Play", command=self.shuffle_play(),
+        self.shuffle_box_var = ctk.StringVar(value="on")
+        self.shuffle_box = ctk.CTkCheckBox(self.navigation_frame, text="Shuffle Play", command=self.shuffle_play(),
                                      variable=self.shuffle_box_var, onvalue="on", offvalue="off")
         self.shuffle_box.grid(row=5, column=0, padx=20, pady=20, sticky="s")
-        self.repeat_box_var = customtkinter.StringVar(value="off")
-        self.repeat_box = customtkinter.CTkCheckBox(self.navigation_frame, text="Repeat Track", command=self.shuffle_play(),
+        self.repeat_box_var = ctk.StringVar(value="off")
+        self.repeat_box = ctk.CTkCheckBox(self.navigation_frame, text="Repeat Track", command=self.shuffle_play(),
                                      variable=self.repeat_box_var, onvalue="on", offvalue="off")
         self.repeat_box.grid(row=4, column=0, padx=20, pady=20, sticky="s")
 
         # create home frame
-        self.home_frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
+        self.home_frame = ctk.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
         self.home_frame.bind_all("<Button-4>", lambda e: self.home_frame._parent_canvas.yview("scroll", -1, "units"))
         self.home_frame.bind_all("<Button-5>", lambda e: self.home_frame._parent_canvas.yview("scroll", 1, "units"))
         self.home_frame.grid_columnconfigure(0, weight=1)
@@ -81,10 +82,10 @@ class App(customtkinter.CTk):
         from main import load_artists
         artists_list = load_artists()
 
-        label = customtkinter.CTkLabel(self.home_frame, text="Search Artists")
+        label = ctk.CTkLabel(self.home_frame, text="Search Artists")
         label.grid(row=0, column=0, padx=20, pady=5, sticky="w")  # Place label in row 0
 
-        searchbox = customtkinter.CTkTextbox(self.home_frame, height=1, wrap="none")
+        searchbox = ctk.CTkTextbox(self.home_frame, height=1, wrap="none")
         searchbox.grid(row=1, column=0, padx=20, pady=5, sticky="nsew")  # Place search box in row 0
 
         # Remove the following line to enable user interaction with the search box
@@ -121,7 +122,7 @@ class App(customtkinter.CTk):
             print(f"Button pressed for album: {album_name}")
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
-            back_button = customtkinter.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", command=lambda: back_to_albums(artist_name))
+            back_button = ctk.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", command=lambda: back_to_albums(artist_name))
             back_button.grid(row=0)
             from main import load_album_songs
             songs_list = load_album_songs(artist_name, album_name)
@@ -136,9 +137,9 @@ class App(customtkinter.CTk):
             print("Status code:", response.status_code)
             if response.status_code == 200:
                 image = Image.open(BytesIO(response.content))
-                self.song_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(30, 30))
-                self.song_image_big = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(145, 145))
-                self.song_image_big_label = customtkinter.CTkLabel(self.home_frame, image=self.song_image_big)
+                self.song_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(30, 30))
+                self.song_image_big = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(145, 145))
+                self.song_image_big_label = ctk.CTkLabel(self.home_frame, image=self.song_image_big)
                 print("song_image_big_label created")
                 row += 1
             else:
@@ -147,9 +148,9 @@ class App(customtkinter.CTk):
                 print("Status code:", response.status_code)
                 if response.status_code == 200:
                     image = Image.open(BytesIO(response.content))
-                    self.song_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(30, 30))
-                    self.song_image_big = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(145, 145))
-                    self.song_image_big_label = customtkinter.CTkLabel(self.home_frame, image=self.song_image_big)
+                    self.song_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(30, 30))
+                    self.song_image_big = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(145, 145))
+                    self.song_image_big_label = ctk.CTkLabel(self.home_frame, image=self.song_image_big)
                     print("song_image_big_label created")
                     row += 1
                 else:
@@ -159,7 +160,7 @@ class App(customtkinter.CTk):
             for song in songs_list:
                 print("Got from Sonic Screwdriver: Song - " + song["name"])
                 songs_list_fr.append(song['name'])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
+                button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
         
@@ -168,10 +169,10 @@ class App(customtkinter.CTk):
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
             if artist_name.endswith(".sonic"):
-                back_button = customtkinter.CTkButton(self.home_frame, text="Back to Plugin Selection", command=lambda: back_to_artists())
+                back_button = ctk.CTkButton(self.home_frame, text="Back to Plugin Selection", command=lambda: back_to_artists())
             else:
                 print("back to artists button !")
-                back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
+                back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
             back_button.grid(row=0, pady=5)
             from main import load_artist_albums
             artist_name_text(artist_name)
@@ -194,16 +195,16 @@ class App(customtkinter.CTk):
                     print(image_url)
                     if response.status_code == 200:
                         image = Image.open(BytesIO(response.content))
-                        self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                        self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                     else:
                         response = requests.get(image_url + ".jpg")
                         if response.status_code == 200:
                             image = Image.open(BytesIO(response.content))
-                            self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                            self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                         else:
                             print("Failed to fetch the album art. Status code:", response.status_code)
                             self.album_image = self.album_placeholder
-                    button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name'].split('.')[1]}", image=self.album_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                    button = ctk.CTkButton(self.home_frame, text=f"{artist['name'].split('.')[1]}", image=self.album_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
 
@@ -218,7 +219,7 @@ class App(customtkinter.CTk):
         def back_to_artists():
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
-            searchbox = customtkinter.CTkTextbox(self.home_frame, height=1, wrap="none")
+            searchbox = ctk.CTkTextbox(self.home_frame, height=1, wrap="none")
             searchbox.grid(row=1, column=0, padx=20, pady=5, sticky="nsew")  # Place search box in row 0
             searchbox.bind("<Button-1>", lambda event: searchbox.delete("1.0", "end"))
             text = searchbox.get("0.0", "end")  # get text from line 0 character 0 till the end
@@ -234,32 +235,32 @@ class App(customtkinter.CTk):
                     print("Detected Plugin!")
                     if not found_plugins:
                         found_plugins = True
-                        button = customtkinter.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                        button = ctk.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                         button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                         row += 1
                 if artist["name"] == "Playlists":
                     print("Detected Playlists!")
-                    button = customtkinter.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                    button = ctk.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
             for artist in artists_list:
                 if artist["name"].startswith(".") or artist["name"] == "Playlists":
                     continue
                 print("Got from Sonic Screwdriver: Artist - " + artist["name"])
-                button = customtkinter.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                button = ctk.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
 
         def artist_name_text(artist_name):
             if artist_name.endswith(".sonic"):
-                artist_text = customtkinter.CTkLabel(self.home_frame, text=artist_name.split(".")[1], anchor="w")
+                artist_text = ctk.CTkLabel(self.home_frame, text=artist_name.split(".")[1], anchor="w")
             else:
-                artist_text = customtkinter.CTkLabel(self.home_frame, text=artist_name, anchor="w")
+                artist_text = ctk.CTkLabel(self.home_frame, text=artist_name, anchor="w")
             artist_text.grid(row=1)
             row = 2
 
         def list_albums(artist_name):
-            back_button = customtkinter.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
+            back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
             back_button.grid(row=0, pady=5)
             row = 2
             from main import load_artist_albums
@@ -277,33 +278,33 @@ class App(customtkinter.CTk):
                 print(image_url)
                 if response.status_code == 200:
                     image = Image.open(BytesIO(response.content))
-                    self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                    self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                 else:
                     print(f"Failed to get PNG: {image_url}.png - Trying JPG instead")
                     response = requests.get(image_url + ".jpg")
                     if response.status_code == 200:
                         image = Image.open(BytesIO(response.content))
-                        self.album_image = customtkinter.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                        self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                     else:
                         print("Failed to fetch the album art. Status code:", response.status_code)
                         self.album_image = self.album_placeholder
                 if artist_name == "Plugins":
                     print(album["name"] + "is the album name")
-                    button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: artist_pressed(album["name"]))
+                    button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: artist_pressed(album["name"]))
                 else:
-                    button = customtkinter.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
+                    button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
 
         list_artists()
 
         # create second frame
-        self.second_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.second_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
         # create third frame
-        self.third_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.third_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
-        self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.fourth_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
         # select default frame
         self.select_frame_by_name("home")
@@ -327,7 +328,7 @@ class App(customtkinter.CTk):
             all_albums_list = load_albums()
             for album in all_albums_list:
                 print("Got from Sonic Screwdriver: Album - " + album)
-                button = customtkinter.CTkButton(self.second_frame, text=f"{album}", image=self.home_image, anchor="w")
+                button = ctk.CTkButton(self.second_frame, text=f"{album}", image=self.home_image, anchor="w")
                 button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                 row += 1
         else:
@@ -349,7 +350,7 @@ class App(customtkinter.CTk):
         self.select_frame_by_name("frame_3")
 
     def change_appearance_mode_event(self, new_appearance_mode):
-        customtkinter.set_appearance_mode(new_appearance_mode)
+        ctk.set_appearance_mode(new_appearance_mode)
 
     def shuffle_play(new_state):
         pass
