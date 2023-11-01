@@ -99,19 +99,19 @@ class App(ctk.CTk):
         row = 2
 
         def song_pressed(artist, album, song, songs_list):
-            from main import MUSIC_DIR
+            from main import SERVER
             player = mimetypes.mimetypes_list[song["name"].rsplit(".", 1)[-1]]
             if artist == "Plugins":
-                command = f'{player} "{MUSIC_DIR}/.{album}.sonic/{song["name"]}"'
+                command = f'{player} "{SERVER}/.{album}.sonic/{song["name"]}"'
             else:
-                command = f'{player} "{MUSIC_DIR}/{artist}/{album}/{song["name"]}"'
+                command = f'{player} "{SERVER}/{artist}/{album}/{song["name"]}"'
             for song_name in songs_list:
                 if artist == "Plugins":
                     if not song_name == song["name"]:
-                        command = command + f' "{MUSIC_DIR}/.{album}.sonic/{song_name}"'
+                        command = command + f' "{SERVER}/.{album}.sonic/{song_name}"'
                 else:
                     if not song_name == song["name"]:
-                        command = command + f' "{MUSIC_DIR}/{artist}/{album}/{song_name}"'
+                        command = command + f' "{SERVER}/{artist}/{album}/{song_name}"'
             print(command)
             if player == "mplayer" or player == "mpv":
                 subprocess.run("killall mplayer", shell=True)
@@ -127,11 +127,11 @@ class App(ctk.CTk):
             from main import load_album_songs
             songs_list = load_album_songs(artist_name, album_name)
             row = 1
-            from main import MUSIC_DIR
+            from main import SERVER
             if artist_name == "Plugins":
-                image_url = f"{MUSIC_DIR}/.{album_name}.sonic/cover"
+                image_url = f"{SERVER}/.{album_name}.sonic/cover"
             else:
-                image_url = f"{MUSIC_DIR}/{artist_name}/{album_name}/cover"
+                image_url = f"{SERVER}/{artist_name}/{album_name}/cover"
             response = requests.get(image_url + ".png")
             print("Image URL:", image_url)
             print("Status code:", response.status_code)
@@ -184,12 +184,12 @@ class App(ctk.CTk):
         def list_plugins():
             row = 3
             from main import load_artists
-            from main import MUSIC_DIR
+            from main import SERVER
             artists_list = load_artists()
             for artist in artists_list:
                 if artist["name"].endswith(".sonic"):
                     print(f"Found Plugin: {artist['name']}")
-                    image_url = f"{MUSIC_DIR}/{artist['name']}/cover"
+                    image_url = f"{SERVER}/{artist['name']}/cover"
                     print(image_url)
                     response = requests.get(image_url + ".png")
                     print(image_url)
@@ -267,13 +267,13 @@ class App(ctk.CTk):
             albums_list = load_artist_albums(artist_name)
             for album in albums_list:
                 print("Got from Sonic Screwdriver: Album - " + album["name"])
-                from main import MUSIC_DIR
+                from main import SERVER
                 if artist_name == "Plugins":
                     print("doing plugins")
-                    image_url = f"{MUSIC_DIR}/{album['name']}/cover"
+                    image_url = f"{SERVER}/{album['name']}/cover"
                     print(image_url)
                 else:
-                    image_url = f"{MUSIC_DIR}/{artist_name}/{album['name']}/cover"
+                    image_url = f"{SERVER}/{artist_name}/{album['name']}/cover"
                 response = requests.get(image_url + ".png")
                 print(image_url)
                 if response.status_code == 200:

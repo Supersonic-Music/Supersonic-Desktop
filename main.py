@@ -1,8 +1,8 @@
 import requests
-from config import MUSIC_DIR, CAL_DIR
+from config import SERVER, CAL_DIR
 
 def load_artists():
-    url = f"{MUSIC_DIR}/{CAL_DIR}/meta/artists.json"
+    url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
 
     response = requests.get(url)
 
@@ -20,14 +20,14 @@ def load_artist_albums(artist_name: str):
             if artist["name"].endswith(".sonic"):
                 albums_list.append(artist)
     else:
-        url = f"{MUSIC_DIR}/{CAL_DIR}/albums/{artist_name}_albums.json"
+        url = f"{SERVER}/{CAL_DIR}/albums/{artist_name}_albums.json"
         response = requests.get(url)
         print(url)
         albums_list = response.json()
     return albums_list
 
 def load_album_songs(artist_name: str, album_name: str):
-    url = f"{MUSIC_DIR}/{CAL_DIR}/songs/{artist_name}_{album_name}_songs.json"
+    url = f"{SERVER}/{CAL_DIR}/songs/{artist_name}_{album_name}_songs.json"
     print(url + "<<<<<<<<<<<<<<<<<<<<<<<<<")
     response = requests.get(url)
     songs_list = response.json()
