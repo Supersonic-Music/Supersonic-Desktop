@@ -1,7 +1,5 @@
 import requests
-
-MUSIC_DIR = "http://localhost:8083/music"
-CAL_DIR = ".cal_sonic_library"
+from config import MUSIC_DIR, CAL_DIR
 
 def load_artists():
     url = f"{MUSIC_DIR}/{CAL_DIR}/meta/artists.json"
