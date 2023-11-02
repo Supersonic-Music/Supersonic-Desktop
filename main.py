@@ -37,7 +37,7 @@ def load_albums():
     all_albums = []
     artists_list = load_artists()
     for artist in artists_list:
-        albums_list = load_artist_albums(artist_name=artist["name"])
+        albums_list = load_artist_albums(artist_name=artist["path"])
         all_albums.append(albums_list)
 
     all_albums_list = []
