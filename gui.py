@@ -100,17 +100,17 @@ class App(ctk.CTk):
 
         def song_pressed(artist, album, song, songs_list):
             from main import SERVER
-            player = mimetypes.mimetypes_list[song["name"].rsplit(".", 1)[-1]]
+            player = mimetypes.mimetypes_list[song["path"].rsplit(".", 1)[-1]]
             if artist == "Plugins":
-                command = f'{player} "{SERVER}/.{album}.sonic/{song["name"]}"'
+                command = f'{player} "{SERVER}/.{album}.sonic/{song["path"]}"'
             else:
-                command = f'{player} "{SERVER}/{artist}/{album}/{song["name"]}"'
+                command = f'{player} "{SERVER}/{artist}/{album}/{song["path"]}"'
             for song_name in songs_list:
                 if artist == "Plugins":
-                    if not song_name == song["name"]:
+                    if not song_name == song["path"]:
                         command = command + f' "{SERVER}/.{album}.sonic/{song_name}"'
                 else:
-                    if not song_name == song["name"]:
+                    if not song_name == song["path"]:
                         command = command + f' "{SERVER}/{artist}/{album}/{song_name}"'
             print(command)
             if player == "mplayer" or player == "mpv":
