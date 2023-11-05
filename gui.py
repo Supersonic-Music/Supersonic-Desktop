@@ -63,10 +63,10 @@ class App(ctk.CTk):
         self.appearance_mode_menu = ctk.CTkOptionMenu(self.navigation_frame, values=["System", "Dark", "Light"],
                                                                 command=self.change_appearance_mode_event)
         self.appearance_mode_menu.grid(row=6, column=0, padx=20, pady=20, sticky="s")
-        self.shuffle_box_var = ctk.StringVar(value="on")
+        self.shuffle_box_var = ctk.StringVar(value="off")
         self.shuffle_box = ctk.CTkCheckBox(self.navigation_frame, text="Shuffle Play", command=self.shuffle_play(),
                                      variable=self.shuffle_box_var, onvalue="on", offvalue="off")
-        self.shuffle_box.grid(row=5, column=0, padx=20, pady=20, sticky="s")
+        # self.shuffle_box.grid(row=5, column=0, padx=20, pady=20, sticky="s")
         self.repeat_box_var = ctk.StringVar(value="off")
         self.repeat_box = ctk.CTkCheckBox(self.navigation_frame, text="Repeat Track", command=self.shuffle_play(),
                                      variable=self.repeat_box_var, onvalue="on", offvalue="off")
@@ -105,15 +105,18 @@ class App(ctk.CTk):
                 command = f'{player} "{SERVER}/.{album}.sonic/{song_clicked["path"]}"'
             else:
                 command = f'{player} "{SERVER}/{artist}/{album}/{song_clicked["path"]}"'
-            for track in songs_list:
-                song_path = track['path']
-                song_name = track['name']
-                if artist == "Plugins":
-                    if not song_path == song_clicked["path"]:
-                        command = command + f' "{SERVER}/.{album}.sonic/{song_name}"'
-                else:
-                    if not song_path == song_clicked["path"]:
-                        command = command + f' "{SERVER}/{artist}/{album}/{song_path}"'
+            if self.repeat_box_var.get() == "on":
+                command = command + " -loop 0"
+            else:
+                for track in songs_list:
+                    song_path = track['path']
+                    song_name = track['name']
+                    if artist == "Plugins":
+                        if not song_path == song_clicked["path"]:
+                            command = command + f' "{SERVER}/.{album}.sonic/{song_name}"'
+                    else:
+                        if not song_path == song_clicked["path"]:
+                            command = command + f' "{SERVER}/{artist}/{album}/{song_path}"'
             print(command)
             if player == "mplayer" or player == "mpv":
                 subprocess.run("killall mplayer", shell=True)
