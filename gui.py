@@ -98,20 +98,22 @@ class App(ctk.CTk):
         searchbox.configure(state="normal")  # configure textbox to be read-only
         row = 2
 
-        def song_pressed(artist, album, song, songs_list):
+        def song_pressed(artist, album, song_clicked, songs_list):
             from main import SERVER
-            player = mimetypes.mimetypes_list[song["path"].rsplit(".", 1)[-1]]
+            player = mimetypes.mimetypes_list[song_clicked["path"].rsplit(".", 1)[-1]]
             if artist == "Plugins":
-                command = f'{player} "{SERVER}/.{album}.sonic/{song["path"]}"'
+                command = f'{player} "{SERVER}/.{album}.sonic/{song_clicked["path"]}"'
             else:
-                command = f'{player} "{SERVER}/{artist}/{album}/{song["path"]}"'
-            for song_name in songs_list:
+                command = f'{player} "{SERVER}/{artist}/{album}/{song_clicked["path"]}"'
+            for track in songs_list:
+                song_path = track['path']
+                song_name = track['name']
                 if artist == "Plugins":
-                    if not song_name == song["path"]:
+                    if not song_path == song_clicked["path"]:
                         command = command + f' "{SERVER}/.{album}.sonic/{song_name}"'
                 else:
-                    if not song_name == song["path"]:
-                        command = command + f' "{SERVER}/{artist}/{album}/{song_name}"'
+                    if not song_path == song_clicked["path"]:
+                        command = command + f' "{SERVER}/{artist}/{album}/{song_path}"'
             print(command)
             if player == "mplayer" or player == "mpv":
                 subprocess.run("killall mplayer", shell=True)
@@ -160,8 +162,8 @@ class App(ctk.CTk):
             for song in songs_list:
                 if not song["path"] == "cover.png" and not song["path"] == "cover.jpg":
                     print("Got from Sonic Screwdriver: Song - " + song["name"])
-                    songs_list_fr.append(song['name'])
-                    button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
+                    songs_list_fr.append(song)
+                    button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song_clicked=song: song_pressed(artist_name, album_name, song_clicked, songs_list_fr))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
         
@@ -360,4 +362,3 @@ class App(ctk.CTk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
-
