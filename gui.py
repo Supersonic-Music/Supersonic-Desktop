@@ -158,11 +158,12 @@ class App(ctk.CTk):
                     self.song_image = self.song_placeholder
             songs_list_fr = []
             for song in songs_list:
-                print("Got from Sonic Screwdriver: Song - " + song["name"])
-                songs_list_fr.append(song['name'])
-                button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
-                button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                row += 1
+                if not song["path"] == "cover.png" and not song["path"] == "cover.jpg":
+                    print("Got from Sonic Screwdriver: Song - " + song["name"])
+                    songs_list_fr.append(song['name'])
+                    button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song=song: song_pressed(artist_name, album_name, song, songs_list_fr))
+                    button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                    row += 1
         
         def artist_pressed(artist_name):
             print(f"Button pressed for artist: {artist_name}")
