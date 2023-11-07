@@ -1,5 +1,5 @@
 # Sonic Desktop (codename: paperback)
-Simple GUI Music Client for [Sonic Screwdriver](https://github.com/yuckdevchan/sonic-screwdriver), written in python.
+Simple Desktop, GUI Music Client that uses the [Sonic Screwdriver](https://github.com/yuckdevchan/sonic-screwdriver) music server, written in python.
 - Only works correctly on Linux so far.
 - Supports plugins.
 - Comes with public server preconfigured.
@@ -8,6 +8,6 @@ Simple GUI Music Client for [Sonic Screwdriver](https://github.com/yuckdevchan/s
 
 ## Plugins
 
-An up-to-date list of available plugins can be found [here]([https://sonic.davros.io](https://sonic.davros.io/getting-started/plugin-system/#Available%20Plugins)).
+An up-to-date list of available plugins for [Sonic Screwdriver](https://github.com/yuckdevchan/sonic-screwdriver) can be found [here]([https://sonic.davros.io](https://sonic.davros.io/getting-started/plugin-system/#Available%20Plugins)).
 
-![Video of Paperback Plugins in Use](https://github.com/yuckdevchan/paperback/assets/60288171/0652788e-345e-4f10-ac90-b20d1685333b)
+![Video of Sonic Screwdriver Plugins in Use in paperback](https://github.com/yuckdevchan/paperback/assets/60288171/0652788e-345e-4f10-ac90-b20d1685333b)
