@@ -1,6 +1,6 @@
 # Sonic Desktop (codename: paperback)
 Simple Desktop, GUI Music Client that uses the [Sonic Screwdriver](https://github.com/yuckdevchan/sonic-screwdriver) music server, written in python.
-- Only works correctly on Linux so far.
+- Only works fully on Linux so far.
 - Supports plugins.
 - Comes with public server preconfigured.
 
