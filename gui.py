@@ -60,7 +60,7 @@ class App(ctk.CTk):
                                                       image=self.add_user_image, anchor="w", command=self.frame_3_button_event)
         self.frame_4_button.grid(row=3, column=0, sticky="ew")
 
-        self.appearance_mode_menu = ctk.CTkOptionMenu(self.navigation_frame, values=["System", "Dark", "Light"],
+        self.appearance_mode_menu = ctk.CTkOptionMenu(self.navigation_frame, fg_color="#4f1cad", values=["System", "Dark", "Light"],
                                                                 command=self.change_appearance_mode_event)
         self.appearance_mode_menu.grid(row=6, column=0, padx=20, pady=20, sticky="s")
         self.shuffle_box_var = ctk.StringVar(value="off")
@@ -237,25 +237,25 @@ class App(ctk.CTk):
             row = 3
             found_plugins = False
             for artist in artists_list:
-                if artist["name"].endswith(".sonic"):
-                    print("Detected Plugin!")
-                    if not found_plugins:
-                        found_plugins = True
-                        button = ctk.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
-                        button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                        row += 1
-                if artist["name"] == "Playlists":
+                if artist["name"].startswith("."):
+                    if artist["name"].endswith(".sonic"):
+                        print("Detected Plugin!")
+                        if not found_plugins:
+                            found_plugins = True
+                            button = ctk.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                            button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                            row += 1
+                elif artist["name"] == "Playlists":
                     print("Detected Playlists!")
                     button = ctk.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name="Plugins": artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
-            for artist in artists_list:
-                if artist["name"].startswith(".") or artist["name"] == "Playlists":
-                    continue
-                print("Got from Sonic Screwdriver: Artist - " + artist["name"])
-                button = ctk.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
-                button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                row += 1
+                else:
+                    print("Got from Sonic Screwdriver: Artist - " + artist["name"])
+                    button = ctk.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", fg_color="#4f1cad", hover_color="#371378", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                    button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                    row += 1
+
 
         def artist_name_text(artist_name):
             if artist_name.endswith(".sonic"):
