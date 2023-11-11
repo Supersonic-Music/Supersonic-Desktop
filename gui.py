@@ -8,7 +8,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Paperback - Sonic Screwdriver")
+        self.title("Sonic Desktop - Your Music in Your Hands.")
         self.geometry("1000x1000")
 
         # set grid layout 1x2
@@ -36,7 +36,7 @@ class App(ctk.CTk):
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
         self.navigation_frame.grid_rowconfigure(4, weight=1)
 
-        self.navigation_frame_label = ctk.CTkLabel(self.navigation_frame, text="  Paperback", image=self.logo_image,
+        self.navigation_frame_label = ctk.CTkLabel(self.navigation_frame, text="  Sonic Desktop", image=self.logo_image,
                                                              compound="left", font=ctk.CTkFont(size=15, weight="bold"))
         self.navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
 

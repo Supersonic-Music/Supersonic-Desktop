@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-/usr/bin/python /home/deck/git/paperback/gui.py
+/usr/bin/python /home/ethan/git/paperback/gui.py

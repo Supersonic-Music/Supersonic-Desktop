@@ -28,7 +28,6 @@ def load_artist_albums(artist_name: str):
 
 def load_album_songs(artist_name: str, album_name: str):
     url = f"{SERVER}/{CAL_DIR}/songs/{artist_name}_{album_name}_songs.json"
-    print(url + "<<<<<<<<<<<<<<<<<<<<<<<<<")
     response = requests.get(url)
     songs_list = response.json()
     return songs_list
@@ -46,6 +45,28 @@ def load_albums():
             if 'name' in album:
                 all_albums_list.append(album['name'])
     return all_albums_list
+
+def load_playlists():
+    url = f"{SERVER}/{CAL_DIR}/meta/playlists.json"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        all_playlists = response.json()
+        return all_playlists
+    else:
+        return [f"Error: {str(response.status_code)}"]
+    
+def load_albums_only():
+    url = f"{SERVER}/{CAL_DIR}/meta/albums.json"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        list_of_albums_only = response.json()
+        return list_of_albums_only
+    else:
+        return [f"Error: {str(response.status_code)}"]
 
 
 def list_stuff(list_of_stuff):
