@@ -1,4 +1,4 @@
-import os, subprocess, mimetypes, requests
+import os, subprocess, mimetypes, requests, time
 import customtkinter as ctk
 from PIL import Image
 from io import BytesIO
@@ -8,7 +8,8 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Sonic Desktop - Your Music in Your Hands.")
+        from config import PROGRAM_NAME, PROGRAM_SLOGAN, PROGRAM_VERSION
+        self.title(PROGRAM_NAME + " " + PROGRAM_VERSION + " - " + PROGRAM_SLOGAN)
         self.geometry("1000x1000")
 
         # set grid layout 1x2
@@ -36,7 +37,7 @@ class App(ctk.CTk):
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
         self.navigation_frame.grid_rowconfigure(4, weight=1)
 
-        self.navigation_frame_label = ctk.CTkLabel(self.navigation_frame, text="  Sonic Desktop", image=self.logo_image,
+        self.navigation_frame_label = ctk.CTkLabel(self.navigation_frame, text=f"  {PROGRAM_NAME}", image=self.logo_image,
                                                              compound="left", font=ctk.CTkFont(size=15, weight="bold"))
         self.navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
 
@@ -191,7 +192,6 @@ class App(ctk.CTk):
             row = 3
             from main import load_artists
             from main import SERVER
-            artists_list = load_artists()
             for artist in artists_list:
                 if artist["name"].endswith(".sonic"):
                     print(f"Found Plugin: {artist['name']}")
@@ -239,17 +239,18 @@ class App(ctk.CTk):
             for artist in artists_list:
                 if artist["name"].startswith("."):
                     if artist["name"].endswith(".sonic"):
-                        print("Detected Plugin!")
-                        if not found_plugins:
-                            found_plugins = True
-                            button = ctk.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                        if artist["name"] == ".Playlists.sonic":
+                            print("Detected Playlists Support!")
+                            button = ctk.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                             button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                             row += 1
-                elif artist["name"] == "Playlists":
-                    print("Detected Playlists!")
-                    button = ctk.CTkButton(self.home_frame, text=f"Playlists", image=self.playlist, anchor="w", fg_color="#0C8701", hover_color="#086100", command=lambda artist_name="Plugins": artist_pressed(artist_name))
-                    button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                    row += 1
+                        else:
+                            print(f"Detected {artist['name'].split('.')[1]} Plugin!")
+                            if not found_plugins:
+                                found_plugins = True
+                                button = ctk.CTkButton(self.home_frame, text=f"Plugins", image=self.plugin, anchor="w", fg_color="#c90306", hover_color="#800001", command=lambda artist_name="Plugins": artist_pressed(artist_name))
+                                button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                                row += 1
                 else:
                     print("Got from Sonic Screwdriver: Artist - " + artist["name"])
                     button = ctk.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", fg_color="#4f1cad", hover_color="#371378", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
@@ -270,37 +271,40 @@ class App(ctk.CTk):
             back_button.grid(row=0, pady=5)
             row = 2
             from main import load_artist_albums
-            albums_list = load_artist_albums(artist_name)
-            for album in albums_list:
-                print("Got from Sonic Screwdriver: Album - " + album["name"])
-                from main import SERVER
-                if artist_name == "Plugins":
-                    print("doing plugins")
-                    image_url = f"{SERVER}/{album['name']}/cover"
+            if artist_name == 'nothing':
+                pass
+            else:
+                albums_list = load_artist_albums(artist_name)
+                for album in albums_list:
+                    print("Got from Sonic Screwdriver: Album - " + album["name"])
+                    from main import SERVER
+                    if artist_name == "Plugins":
+                        print("doing plugins")
+                        image_url = f"{SERVER}/{album['name']}/cover"
+                        print(image_url)
+                    else:
+                        image_url = f"{SERVER}/{artist_name}/{album['name']}/cover"
+                    response = requests.get(image_url + ".png")
                     print(image_url)
-                else:
-                    image_url = f"{SERVER}/{artist_name}/{album['name']}/cover"
-                response = requests.get(image_url + ".png")
-                print(image_url)
-                if response.status_code == 200:
-                    image = Image.open(BytesIO(response.content))
-                    self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
-                else:
-                    print(f"Failed to get PNG: {image_url}.png - Trying JPG instead")
-                    response = requests.get(image_url + ".jpg")
                     if response.status_code == 200:
                         image = Image.open(BytesIO(response.content))
                         self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                     else:
-                        print("Failed to fetch the album art. Status code:", response.status_code)
-                        self.album_image = self.album_placeholder
-                if artist_name == "Plugins":
-                    print(album["name"] + "is the album name")
-                    button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: artist_pressed(album["name"]))
-                else:
-                    button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
-                button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
-                row += 1
+                        print(f"Failed to get PNG: {image_url}.png - Trying JPG instead")
+                        response = requests.get(image_url + ".jpg")
+                        if response.status_code == 200:
+                            image = Image.open(BytesIO(response.content))
+                            self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                        else:
+                            print("Failed to fetch the album art. Status code:", response.status_code)
+                            self.album_image = self.album_placeholder
+                    if artist_name == "Plugins":
+                        print(album["name"] + "is the album name")
+                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: artist_pressed(album["name"]))
+                    else:
+                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
+                    button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
+                    row += 1
 
         list_artists()
 

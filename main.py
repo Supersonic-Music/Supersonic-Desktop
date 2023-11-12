@@ -1,7 +1,25 @@
-import requests
+import requests, time
 from config import SERVER, CAL_DIR
+import platform    # For getting the operating system name
+import subprocess  # For executing a shell command
+
+def ping_server(host=SERVER):
+    """
+    Returns True if host (str) responds to a ping request.
+    Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
+    """
+
+    # Option for the number of packets as a function of
+    param = '-n' if platform.system().lower()=='windows' else '-c'
+
+    # Building the command. Ex: "ping -c 1 google.com"
+    command = ['ping', param, '1', host]
+
+    return subprocess.call(command) == 0
+
 
 def load_artists():
+    start_time = time.time()
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
 
     response = requests.get(url)
@@ -11,6 +29,8 @@ def load_artists():
         return artists_list
     else:
         return [f"Error: {str(response.status_code)}"]
+    end_time = time.time()
+    print(f"Time Elapsed: {end_time - start_time}")
 
 def load_artist_albums(artist_name: str):
     if artist_name == "Plugins":
@@ -46,16 +66,16 @@ def load_albums():
                 all_albums_list.append(album['name'])
     return all_albums_list
 
-def load_playlists():
-    url = f"{SERVER}/{CAL_DIR}/meta/playlists.json"
+# def load_playlists():
+#     url = f"{SERVER}/{CAL_DIR}/meta/playlists.json"
 
-    response = requests.get(url)
+#     response = requests.get(url)
 
-    if response.status_code == 200:
-        all_playlists = response.json()
-        return all_playlists
-    else:
-        return [f"Error: {str(response.status_code)}"]
+#     if response.status_code == 200:
+#         all_playlists = response.json()
+#         return all_playlists
+#     else:
+#         return [f"Error: {str(response.status_code)}"]
     
 def load_albums_only():
     url = f"{SERVER}/{CAL_DIR}/meta/albums.json"
@@ -72,6 +92,11 @@ def load_albums_only():
 def list_stuff(list_of_stuff):
     for thing in list_of_stuff:
         print(thing["name"])
+        
+from config import FALLBACK_SERVER
+if not ping_server():
+    print("Falling Back to Public Server")
+    SERVER = SERVER
 
 # if __name__ == "__main__":
 #     artists_list = load_artists()
