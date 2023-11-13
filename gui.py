@@ -1,4 +1,5 @@
 import os, subprocess, mimetypes, requests, time
+from config import MAIN_COL, MAIN_COL_HOVER
 import customtkinter as ctk
 from PIL import Image
 from io import BytesIO
@@ -128,7 +129,7 @@ class App(ctk.CTk):
             print(f"Button pressed for album: {album_name}")
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
-            back_button = ctk.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", command=lambda: back_to_albums(artist_name))
+            back_button = ctk.CTkButton(self.home_frame, text=f"Back to {artist_name}'s Albums", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda: back_to_albums(artist_name))
             back_button.grid(row=0)
             from main import load_album_songs
             songs_list = load_album_songs(artist_name, album_name)
@@ -167,7 +168,7 @@ class App(ctk.CTk):
                 if not song["path"] == "cover.png" and not song["path"] == "cover.jpg":
                     print("Got from Sonic Screwdriver: Song - " + song["name"])
                     songs_list_fr.append(song)
-                    button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", command=lambda song_clicked=song: song_pressed(artist_name, album_name, song_clicked, songs_list_fr))
+                    button = ctk.CTkButton(self.home_frame, text=f"{song['name']}", image=self.song_image, anchor="w", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda song_clicked=song: song_pressed(artist_name, album_name, song_clicked, songs_list_fr))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
         
@@ -300,9 +301,9 @@ class App(ctk.CTk):
                             self.album_image = self.album_placeholder
                     if artist_name == "Plugins":
                         print(album["name"] + "is the album name")
-                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: artist_pressed(album["name"]))
+                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda album_name=album['name']: artist_pressed(album["name"]))
                     else:
-                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
+                        button = ctk.CTkButton(self.home_frame, text=f"{album['name']}", image=self.album_image, anchor="w", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda album_name=album['name']: album_pressed(artist_name, album_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
 

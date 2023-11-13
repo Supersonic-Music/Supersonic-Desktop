@@ -22,15 +22,16 @@ def load_artists():
     start_time = time.time()
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
 
+    print("EWPROJGIOWRKGOIWEHFIUERHGIUERHGEHRu")
     response = requests.get(url)
-
+    print(response.status_code)
+    
     if response.status_code == 200:
         artists_list = response.json()
         return artists_list
     else:
+        print("FRGIUOERGIUHERGIUERGBIWRHGIJWRHGIU")
         return [f"Error: {str(response.status_code)}"]
-    end_time = time.time()
-    print(f"Time Elapsed: {end_time - start_time}")
 
 def load_artist_albums(artist_name: str):
     if artist_name == "Plugins":
