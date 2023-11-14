@@ -2,6 +2,7 @@ import requests, time
 from config import SERVER, CAL_DIR
 import platform    # For getting the operating system name
 import subprocess  # For executing a shell command
+import mimetypes
 
 def ping_server(host=SERVER):
     """
@@ -21,16 +22,14 @@ def ping_server(host=SERVER):
 def load_artists():
     start_time = time.time()
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
-
-    print("EWPROJGIOWRKGOIWEHFIUERHGIUERHGEHRu")
     response = requests.get(url)
-    print(response.status_code)
-    
     if response.status_code == 200:
         artists_list = response.json()
+        time_taken = time.time() - start_time
+        print(f"Got {len(artists_list)} artists in {round(time_taken, 2)} seconds.")
         return artists_list
     else:
-        print("FRGIUOERGIUHERGIUERGBIWRHGIJWRHGIU")
+        print("Could not load artists!!!")
         return [f"Error: {str(response.status_code)}"]
 
 def load_artist_albums(artist_name: str):
@@ -43,7 +42,6 @@ def load_artist_albums(artist_name: str):
     else:
         url = f"{SERVER}/{CAL_DIR}/albums/{artist_name}_albums.json"
         response = requests.get(url)
-        print(url)
         albums_list = response.json()
     return albums_list
 
@@ -93,7 +91,15 @@ def load_albums_only():
 def list_stuff(list_of_stuff):
     for thing in list_of_stuff:
         print(thing["name"])
-        
+
+def play_song(artist_name, album_name, song):
+    player = mimetypes.mimetypes_list[song.rsplit(".", 1)[-1]]
+    command = f'{player} "{SERVER}/{artist_name}/{album_name}/{song}"'
+    print(player)
+    subprocess.run("killall mplayer", shell=True)
+    subprocess.run("killall mpv", shell=True)
+    subprocess.Popen(command, shell=True)
+
 from config import FALLBACK_SERVER
 if not ping_server():
     print("Falling Back to Public Server")

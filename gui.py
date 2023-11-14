@@ -1,5 +1,6 @@
 import os, subprocess, mimetypes, requests, time
 from config import MAIN_COL, MAIN_COL_HOVER
+from main import load_artists
 import customtkinter as ctk
 from PIL import Image
 from io import BytesIO
@@ -32,6 +33,7 @@ class App(ctk.CTk):
         self.song_placeholder = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "song_light.png")), size=(30, 30))
         self.plugin = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "plugin_light.png")), size=(20, 20))
         self.playlist = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "playlist_light.png")), size=(20, 20))
+        self.playlist_big = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "playlist_light.png")), size=(60, 60))
 
         # create navigation frame
         self.navigation_frame = ctk.CTkFrame(self, corner_radius=25)
@@ -81,8 +83,6 @@ class App(ctk.CTk):
         self.home_frame.grid_columnconfigure(0, weight=1)
 
         # stuff
-        from main import load_artists
-        artists_list = load_artists()
 
         label = ctk.CTkLabel(self.home_frame, text="Search Artists")
         label.grid(row=0, column=0, padx=20, pady=5, sticky="w")  # Place label in row 0
@@ -99,7 +99,8 @@ class App(ctk.CTk):
         searchbox.delete("0.0", "end")  # delete all text
         searchbox.configure(state="normal")  # configure textbox to be read-only
         row = 2
-
+        artists_list = load_artists()
+        
         def song_pressed(artist, album, song_clicked, songs_list):
             from main import SERVER
             player = mimetypes.mimetypes_list[song_clicked["path"].rsplit(".", 1)[-1]]
@@ -177,10 +178,10 @@ class App(ctk.CTk):
             for widget in self.home_frame.grid_slaves():
                 widget.grid_forget()
             if artist_name.endswith(".sonic"):
-                back_button = ctk.CTkButton(self.home_frame, text="Back to Plugin Selection", command=lambda: back_to_artists())
+                back_button = ctk.CTkButton(self.home_frame, text="Back to Plugin Selection", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda: back_to_artists())
             else:
                 print("back to artists button !")
-                back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
+                back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda: back_to_artists())
             back_button.grid(row=0, pady=5)
             from main import load_artist_albums
             artist_name_text(artist_name)
@@ -196,22 +197,25 @@ class App(ctk.CTk):
             for artist in artists_list:
                 if artist["name"].endswith(".sonic"):
                     print(f"Found Plugin: {artist['name']}")
-                    image_url = f"{SERVER}/{artist['name']}/cover"
-                    print(image_url)
-                    response = requests.get(image_url + ".png")
-                    print(image_url)
-                    if response.status_code == 200:
-                        image = Image.open(BytesIO(response.content))
-                        self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                    if artist["name"] == ".Playlists.sonic":
+                        self.album_image = self.playlist_big
                     else:
-                        response = requests.get(image_url + ".jpg")
+                        image_url = f"{SERVER}/{artist['name']}/cover"
+                        print(image_url)
+                        response = requests.get(image_url + ".png")
+                        print(image_url)
                         if response.status_code == 200:
                             image = Image.open(BytesIO(response.content))
                             self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
                         else:
-                            print("Failed to fetch the album art. Status code:", response.status_code)
-                            self.album_image = self.album_placeholder
-                    button = ctk.CTkButton(self.home_frame, text=f"{artist['name'].split('.')[1]}", image=self.album_image, anchor="w", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
+                            response = requests.get(image_url + ".jpg")
+                            if response.status_code == 200:
+                                image = Image.open(BytesIO(response.content))
+                                self.album_image = ctk.CTkImage(Image.open(BytesIO(response.content)), size=(60, 60))
+                            else:
+                                print("Failed to fetch the album art. Status code:", response.status_code)
+                                self.album_image = self.album_placeholder
+                    button = ctk.CTkButton(self.home_frame, text=f"{artist['name'].split('.')[1]}", image=self.album_image, anchor="w", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
 
@@ -237,7 +241,13 @@ class App(ctk.CTk):
         def list_artists():
             row = 3
             found_plugins = False
+            start_time = time.time()
+            artists_done = 0
             for artist in artists_list:
+                if artists_done == 10:
+                    break
+                else:
+                    artists_done += 1
                 if artist["name"].startswith("."):
                     if artist["name"].endswith(".sonic"):
                         if artist["name"] == ".Playlists.sonic":
@@ -257,6 +267,8 @@ class App(ctk.CTk):
                     button = ctk.CTkButton(self.home_frame, text=f"{artist['name']}", image=self.home_image, anchor="w", fg_color="#4f1cad", hover_color="#371378", command=lambda artist_name=artist['name']: artist_pressed(artist_name))
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
+            end_time = time.time()
+            print(f"Time taken to load artists: {end_time - start_time} seconds.")
 
 
         def artist_name_text(artist_name):
@@ -268,7 +280,7 @@ class App(ctk.CTk):
             row = 2
 
         def list_albums(artist_name):
-            back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", command=lambda: back_to_artists())
+            back_button = ctk.CTkButton(self.home_frame, text="Back to Artists", fg_color=MAIN_COL, hover_color=MAIN_COL_HOVER, command=lambda: back_to_artists())
             back_button.grid(row=0, pady=5)
             row = 2
             from main import load_artist_albums
@@ -307,7 +319,6 @@ class App(ctk.CTk):
                     button.grid(row=row, column=0, padx=20, pady=5, sticky="nsew")
                     row += 1
 
-        list_artists()
 
         # create second frame
         self.second_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -319,6 +330,8 @@ class App(ctk.CTk):
 
         # select default frame
         self.select_frame_by_name("home")
+        
+        list_artists()
 
     def select_frame_by_name(self, name):
         # set button color for selected button
