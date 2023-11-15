@@ -25,7 +25,15 @@ class MainWindow(Gtk.ApplicationWindow):
         sidebar = Gtk.Grid()
         sidebar.set_column_homogeneous(True)
 
-        sidebar_buttons = [{"name": "Artists", "icon": "avatar-default-symbolic"}, {"name": "Albums", "icon": "folder-music-symbolic"}, {"name": "Songs", "icon": "folder-music-symbolic"}, {"name": "Playlists", "icon": "folder-music-symbolic"}, {"name": "Settings", "icon": "folder-music-symbolic"}, {"name": "About", "icon": "folder-music-symbolic"}]
+        sidebar_buttons = [
+            {"name": "Artists", "icon": "avatar-default-symbolic"}, 
+            {"name": "Albums", "icon": "media-optical-symbolic"}, 
+            {"name": "Songs", "icon": "folder-music-symbolic"}, 
+            {"name": "Playlists", "icon": "view-media-playlist-symbolic"}, 
+            {"name": "Settings", "icon": "emblem-system-symbolic"}, 
+            {"name": "About", "icon": "dialog-information-symbolic"}
+        ]
+        
         for sidebar_button in sidebar_buttons:
             button = Gtk.Button()
             box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
