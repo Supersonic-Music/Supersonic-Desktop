@@ -14,21 +14,57 @@ class MainWindow(Gtk.ApplicationWindow):
         super().__init__(*args, **kwargs)
         self.set_title(f"{PROGRAM_NAME} {PROGRAM_VERSION} - {PROGRAM_SLOGAN}")
         self.set_default_size(800, 600)
-        
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(b'''
-            .colorful-button {
-                background-color: #00ff00;
-                color: #ffffff;
-                /* Add any other styles you want */
-            }
-        ''')
 
         # Create a Gtk.Stack
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(275)
-        self.set_child(self.stack)
+
+        # Create a Gtk.Box for the sidebar
+        # Create a Gtk.Grid for the sidebar
+        sidebar = Gtk.Grid()
+        sidebar.set_column_homogeneous(True)
+
+        sidebar_buttons = [{"name": "Artists", "icon": "avatar-default-symbolic"}, {"name": "Albums", "icon": "folder-music-symbolic"}, {"name": "Songs", "icon": "folder-music-symbolic"}, {"name": "Playlists", "icon": "folder-music-symbolic"}, {"name": "Settings", "icon": "folder-music-symbolic"}, {"name": "About", "icon": "folder-music-symbolic"}]
+        for sidebar_button in sidebar_buttons:
+            button = Gtk.Button()
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+            icon = Gtk.Image()
+            icon.set_from_icon_name(sidebar_button["icon"])
+            icon.set_pixel_size(16)  # Set the icon size in pixels
+            label = Gtk.Label()
+            label.set_text(sidebar_button["name"])
+            box.append(icon)
+            box.append(label)
+            button.set_child(box)
+            sidebar.attach(button, 0, sidebar_buttons.index(sidebar_button), 1, 1)
+
+            # Get the style context for this button
+            style_context = button.get_style_context()
+
+            # Create a new CssProvider
+            css_provider = Gtk.CssProvider()
+
+            # Load the CSS data into the CssProvider
+            css_provider.load_from_data(b"""
+            button {
+                border-radius: 0;
+            }
+            """)
+
+            # Add the CssProvider to the button's style context
+            style_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        # Add the sidebar and the stack to the sidebar_box
+        sidebar_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        sidebar_box.append(sidebar)
+        sidebar_box.append(self.stack)
+
+        # Make the stack expand to take up the rest of the space
+        self.stack.set_hexpand(True)
+
+        # Add the sidebar_box to the main window
+        self.set_child(sidebar_box)
 
         # Create a ScrolledWindow for the list of artists
         scrolled_window = Gtk.ScrolledWindow()
@@ -40,16 +76,28 @@ class MainWindow(Gtk.ApplicationWindow):
         server_up = ping_server()
         if server_up:
             artists_list = load_artists()
+            found_plugins = False
+            first_artist = True
             for artist in artists_list:
                 artist_name = artist["name"]
                 if artist_name.startswith("."):
                     if artist_name.endswith(".sonic"):
+                        if not found_plugins:
+                            plugins_label = Gtk.Label()
+                            plugins_label.set_text("Plugins")
+                            self.box1.append(plugins_label)
+                        found_plugins = True
                         plugin_name = artist_name.split(".")[1]
                         print(f"Found {plugin_name} Plugin!")
                         button = Gtk.Button(label=plugin_name)
                         self.box1.append(button)
                         button.connect('clicked', self.on_button_clicked, artist_name)
                 else:
+                    if first_artist:
+                        first_artist = False
+                        artists_label = Gtk.Label()
+                        artists_label.set_text("Artists")
+                        self.box1.append(artists_label)
                     button = Gtk.Button(label=artist_name)
                     self.box1.append(button)
                     button.connect('clicked', self.on_button_clicked, artist_name)
