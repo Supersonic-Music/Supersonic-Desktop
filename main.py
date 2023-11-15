@@ -4,20 +4,16 @@ import platform    # For getting the operating system name
 import subprocess  # For executing a shell command
 import mimetypes
 
-def ping_server(host=SERVER):
-    """
-    Returns True if host (str) responds to a ping request.
-    Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
-    """
-
-    # Option for the number of packets as a function of
-    param = '-n' if platform.system().lower()=='windows' else '-c'
-
-    # Building the command. Ex: "ping -c 1 google.com"
-    command = ['ping', param, '1', host]
-
-    return subprocess.call(command) == 0
-
+def ping_server():
+    url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except:
+        return False
 
 def load_artists():
     start_time = time.time()
@@ -33,16 +29,9 @@ def load_artists():
         return [f"Error: {str(response.status_code)}"]
 
 def load_artist_albums(artist_name: str):
-    if artist_name == "Plugins":
-        artists_list = load_artists()
-        albums_list = []
-        for artist in artists_list:
-            if artist["name"].endswith(".sonic"):
-                albums_list.append(artist)
-    else:
-        url = f"{SERVER}/{CAL_DIR}/albums/{artist_name}_albums.json"
-        response = requests.get(url)
-        albums_list = response.json()
+    url = f"{SERVER}/{CAL_DIR}/albums/{artist_name}_albums.json"
+    response = requests.get(url)
+    albums_list = response.json()
     return albums_list
 
 def load_album_songs(artist_name: str, album_name: str):
@@ -92,13 +81,32 @@ def list_stuff(list_of_stuff):
     for thing in list_of_stuff:
         print(thing["name"])
 
-def play_song(artist_name, album_name, song):
+def play_song(artist_name, album_name, song, song_queue):
     player = mimetypes.mimetypes_list[song.rsplit(".", 1)[-1]]
     command = f'{player} "{SERVER}/{artist_name}/{album_name}/{song}"'
+    for songy in song_queue:
+        if songy == song:
+            pass
+        else:
+            command += f' "{SERVER}/{artist_name}/{album_name}/{songy}"'
     print(player)
     subprocess.run("killall mplayer", shell=True)
     subprocess.run("killall mpv", shell=True)
     subprocess.Popen(command, shell=True)
+
+def get_cover(artist_name, album_name):
+    image_url = f"{SERVER}/{artist_name}/{album_name}/cover"
+    response = requests.get(image_url + ".png")
+    if response.status_code == 200:
+        cover = response.content
+    else:
+        response = requests.get(image_url + ".jpg")
+        if response.status_code == 200:
+            cover = response.content
+        else:
+            print("Failed to fetch the album art. Status code:", response.status_code)
+            cover = None
+    return cover
 
 from config import FALLBACK_SERVER
 if not ping_server():
