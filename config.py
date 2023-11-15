@@ -6,9 +6,9 @@ FALLBACK_SERVER = "http://atomic123.pythonanywhere.com/music" # Public Server
 CAL_DIR = ".cal_sonic_library"
 
 # Specify settings about the program
-PROGRAM_NAME = "Sonic Desktop"
+PROGRAM_NAME = "Supersonic Desktop"
 PROGRAM_SLOGAN = "Your Music in Your Hands."
-PROGRAM_VERSION = "0.2-ish"
+PROGRAM_VERSION = "0.5-ish"
 
 # Specify Colour Scheme
 MAIN_COL = "#4f1cad"
