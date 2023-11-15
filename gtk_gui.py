@@ -26,12 +26,12 @@ class MainWindow(Gtk.ApplicationWindow):
         sidebar.set_column_homogeneous(True)
 
         sidebar_buttons = [
-            {"name": "Artists", "icon": "avatar-default-symbolic"}, 
-            {"name": "Albums", "icon": "media-optical-symbolic"}, 
-            {"name": "Songs", "icon": "folder-music-symbolic"}, 
-            {"name": "Playlists", "icon": "view-media-playlist-symbolic"}, 
-            {"name": "Settings", "icon": "emblem-system-symbolic"}, 
-            {"name": "About", "icon": "dialog-information-symbolic"}
+            {"name": "Artists", "icon": "avatar-default-symbolic", "action": "on_back_to_artists_clicked"}, 
+            {"name": "Albums", "icon": "media-optical-symbolic", "action": "show_about"}, 
+            {"name": "Songs", "icon": "folder-music-symbolic", "action": "show_about"}, 
+            {"name": "Playlists", "icon": "view-media-playlist-symbolic", "action": "show_about"}, 
+            {"name": "Settings", "icon": "emblem-system-symbolic", "action": "show_about"}, 
+            {"name": "About", "icon": "dialog-information-symbolic", "action": "show_about"}
         ]
         
         for sidebar_button in sidebar_buttons:
@@ -45,6 +45,7 @@ class MainWindow(Gtk.ApplicationWindow):
             box.append(icon)
             box.append(label)
             button.set_child(box)
+            button.connect('clicked', getattr(self, sidebar_button["action"]))
             sidebar.attach(button, 0, sidebar_buttons.index(sidebar_button), 1, 1)
 
             # Get the style context for this button
@@ -248,6 +249,23 @@ class MainWindow(Gtk.ApplicationWindow):
     def on_back_to_artists_clicked(self, button):
         # Switch back to the artist list page
         self.stack.set_visible_child_name("artists_list")
+        
+    def show_about(self, button):
+        self.about = Gtk.AboutDialog()
+        self.about.set_transient_for(self)  # Makes the dialog always appear in from of the parent window
+        self.about.set_modal(self)  # Makes the parent window unresponsive while dialog is showing
+
+        self.about.set_program_name(PROGRAM_NAME)
+        self.about.set_authors(["Ethan Martin"])
+        self.about.set_copyright("Copyright 2023 Ethan Martin")
+        self.about.set_license_type(Gtk.License.MIT_X11)
+        self.about.set_website("https://github.com/yuckdevchan/Supersonic-Desktop")
+        self.about.set_website_label("GitHub")
+        self.about.set_version(PROGRAM_VERSION)
+        self.about.set_logo_icon_name("io.davros.sonic")  # The icon will need to be added to appropriate location
+                                                 # E.g. /usr/share/icons/hicolor/scalable/apps/org.example.example.svg
+
+        self.about.set_visible(True)
 
     def __del__(self):
         # Stop mplayer
