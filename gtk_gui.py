@@ -29,6 +29,7 @@ class MainWindow(Gtk.ApplicationWindow):
             {"name": "Artists", "icon": "avatar-default-symbolic", "action": "on_back_to_artists_clicked"}, 
             {"name": "Albums", "icon": "media-optical-symbolic", "action": "show_about"}, 
             {"name": "Songs", "icon": "folder-music-symbolic", "action": "show_about"}, 
+            {"name": "Decades", "icon": "emblem-synchronizing-symbolic", "action": "on_decades_clicked"}, 
             {"name": "Playlists", "icon": "view-media-playlist-symbolic", "action": "show_about"}, 
             {"name": "Settings", "icon": "emblem-system-symbolic", "action": "show_about"}, 
             {"name": "About", "icon": "dialog-information-symbolic", "action": "show_about"}
@@ -121,6 +122,11 @@ class MainWindow(Gtk.ApplicationWindow):
         scrolled_artist_window = Gtk.ScrolledWindow()
         scrolled_artist_window.set_child(self.artist_details_box)
         # self.stack.add_named(scrolled_artist_window, "artist_details")
+        
+        self.decades_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        scrolled_decades_window = Gtk.ScrolledWindow()
+        scrolled_decades_window.set_child(self.decades_box)
+        self.stack.add_titled(self.decades_box, "decades_list", "Decades")
 
         # Create a Gtk.Box for the song listing page
         self.song_listing_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -182,6 +188,22 @@ class MainWindow(Gtk.ApplicationWindow):
         else:
             back_to_albums_label = f"Back to {artist_name}'s Albums"
         back_button = Gtk.Button(label=back_to_albums_label)
+        back_button.set_margin_bottom(5)
+
+        # Create a CssProvider
+        css_provider = Gtk.CssProvider()
+
+        # Load the CSS
+        css_provider.load_from_data(b"""
+            button {
+                border-radius: 0px;
+            }
+        """)
+
+        # Add the CssProvider to the button's style context
+        style_context = back_button.get_style_context()
+        style_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
         self.song_listing_box.append(back_button)
         back_button.connect('clicked', self.on_back_to_albums_clicked)
         
@@ -206,6 +228,8 @@ class MainWindow(Gtk.ApplicationWindow):
                 song_queue.append(song_path)
                 # Create a new button
                 button = Gtk.Button()
+                button.set_margin_top(5)  # Add 5 pixels of space at the top of the button
+                button.set_margin_bottom(5)  # Add 5 pixels of space at the bottom of the button
 
                 # Create a new box
                 box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -249,6 +273,20 @@ class MainWindow(Gtk.ApplicationWindow):
     def on_back_to_artists_clicked(self, button):
         # Switch back to the artist list page
         self.stack.set_visible_child_name("artists_list")
+        
+    def on_decades_clicked(self, button):
+        decades = ["1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"]
+        for decade in decades:
+            # Create a new label for each decade
+            decade_label = Gtk.Label()
+            decade_label.set_text(decade + "s")
+            # Add the label to 'decades_box'
+            self.decades_box.append(decade_label)
+            # Show the label
+            decade_label.show()
+
+        # Switch to the 'decades_list' after it has been populated
+        self.stack.set_visible_child_name("decades_list")
         
     def show_about(self, button):
         self.about = Gtk.AboutDialog()
