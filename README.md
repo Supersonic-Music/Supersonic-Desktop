@@ -1,3 +1,5 @@
+<img alt="Sonic Desktop Logo" src="https://github.com/yuckdevchan/Supersonic-Desktop/assets/60288171/cd5ebc73-8ad6-4e44-995b-910fe87d9dcc" height="90">
+
 # Supersonic Desktop (codename: paperback)
 Simple Desktop, GUI Music Client that uses the [Sonic Screwdriver](https://github.com/yuckdevchan/sonic-screwdriver) music server, written in python.
 - Only works fully on Linux so far.
