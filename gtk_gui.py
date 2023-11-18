@@ -35,11 +35,11 @@ class MainWindow(Gtk.ApplicationWindow):
 
         sidebar_buttons = [
             {"name": "Artists", "icon": "avatar-default-symbolic", "action": "on_back_to_artists_clicked"}, 
-            {"name": "Albums", "icon": "media-optical-symbolic", "action": "show_about"}, 
-            {"name": "Songs", "icon": "folder-music-symbolic", "action": "show_about"}, 
-            {"name": "Decades", "icon": "emblem-synchronizing-symbolic", "action": "on_decades_clicked"}, 
-            {"name": "Playlists", "icon": "view-media-playlist-symbolic", "action": "show_about"}, 
-            {"name": "Settings", "icon": "emblem-system-symbolic", "action": "show_about"}, 
+            # {"name": "Albums", "icon": "media-optical-symbolic", "action": "show_about"}, 
+            # {"name": "Songs", "icon": "folder-music-symbolic", "action": "show_about"}, 
+            # {"name": "Decades", "icon": "emblem-synchronizing-symbolic", "action": "on_decades_clicked"}, 
+            # {"name": "Playlists", "icon": "view-media-playlist-symbolic", "action": "show_about"}, 
+            # {"name": "Settings", "icon": "emblem-system-symbolic", "action": "show_about"}, 
             {"name": "About", "icon": "dialog-information-symbolic", "action": "show_about"}
         ]
         
@@ -68,16 +68,16 @@ class MainWindow(Gtk.ApplicationWindow):
 
         controls_label = Gtk.Label()
         controls_label.set_text("Controls")
-        controls_pause_play = Gtk.Button()
+        self.controls_pause_play = Gtk.Button()
         controls_skip_forward = Gtk.Button()
         controls_skip_backward = Gtk.Button()
         controls_stop = Gtk.Button()
         behaviour_label = Gtk.Label()
         behaviour_label.set_text("Behaviour")
         controls_repeat_track = Gtk.Button()
-        controls_pause_play.connect('clicked', self.controls_pause_play_clicked)
+        self.controls_pause_play.connect('clicked', self.controls_pause_play_clicked)
         controls_stop.connect('clicked', self.controls_stop_clicked)
-        controls_pause_play.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        self.controls_pause_play.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         controls_skip_forward.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         controls_skip_backward.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         controls_stop.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
@@ -97,18 +97,18 @@ class MainWindow(Gtk.ApplicationWindow):
         skip_backward_icon.set_pixel_size(16)
         stop_icon.set_pixel_size(16)
         repeat_track_icon.set_pixel_size(16)
-        controls_pause_play.set_child(pause_play_icon)
+        self.controls_pause_play.set_child(pause_play_icon)
         controls_skip_forward.set_child(skip_forward_icon)
         controls_skip_backward.set_child(skip_backward_icon)
         controls_stop.set_child(stop_icon)
         controls_repeat_track.set_child(repeat_track_icon)
         sidebar.attach(controls_label, 0, 7, 1, 1)
-        sidebar.attach(controls_skip_forward, 0, 8, 1, 1)
-        sidebar.attach(controls_pause_play, 0, 9, 1, 1)
-        sidebar.attach(controls_skip_backward, 0, 10, 1, 1)
+        # sidebar.attach(controls_skip_forward, 0, 8, 1, 1)
+        sidebar.attach(self.controls_pause_play, 0, 9, 1, 1)
+        # sidebar.attach(controls_skip_backward, 0, 10, 1, 1)
         sidebar.attach(controls_stop, 0, 11, 1, 1)
-        sidebar.attach(behaviour_label, 0, 12, 1, 1)
-        sidebar.attach(controls_repeat_track, 0, 13, 1, 1)
+        # sidebar.attach(behaviour_label, 0, 12, 1, 1)
+        # sidebar.attach(controls_repeat_track, 0, 13, 1, 1)
         
         # Add the sidebar and the stack to the sidebar_box
         sidebar_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -148,11 +148,11 @@ class MainWindow(Gtk.ApplicationWindow):
                     if artist_name.endswith(".sonic"):
                         if not found_plugins:
                             plugins_label = Gtk.Label()
-                            plugins_label.set_text("Plugins")
+                            plugins_label.set_text("Add-ons")
                             self.box1.append(plugins_label)
                         found_plugins = True
                         plugin_name = artist_name.split(".")[1]
-                        print(f"Found {plugin_name} Plugin!")
+                        print(f"Found {plugin_name} Add-on!")
 
                         # Create a button without a label
                         button = Gtk.Button()
@@ -161,13 +161,20 @@ class MainWindow(Gtk.ApplicationWindow):
                         label = Gtk.Label(label=plugin_name)
 
                         # Create an icon
-                        icon = Gtk.Image()
-                        icon.set_from_icon_name("application-x-addon-symbolic")
-                        icon.set_pixel_size(16)  # Set the pixel size to 16
+                        cover = get_cover(artist_name, album_name="Plugins")
+                        if cover is not None:
+                            image = Image.open(BytesIO(cover))
+                            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                            image.save(temp_file)
+                            image = Gtk.Picture.new_for_filename(temp_file.name)
+                        else:
+                            print("Cover is None")
+                            image = Gtk.Image.new_from_icon_name("application-x-addon-symbolic")
+                            image.set_pixel_size(20)
 
                         # Create a box to hold the icon and label
                         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-                        box.append(icon)
+                        box.append(image)
                         box.append(label)
 
                         # Set the box as the child of the button
@@ -193,7 +200,7 @@ class MainWindow(Gtk.ApplicationWindow):
                     # Create an icon
                     icon = Gtk.Image()
                     icon.set_from_icon_name("avatar-default-symbolic")
-                    icon.set_pixel_size(16)  # Set the pixel size to 16
+                    icon.set_pixel_size(20)
 
                     # Create a box to hold the icon and label
                     box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
@@ -232,6 +239,7 @@ class MainWindow(Gtk.ApplicationWindow):
         new_artist_details_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         back_button = Gtk.Button(label=f"Back to Artists")
+        back_button.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         new_artist_details_box.append(back_button)
         back_button.connect('clicked', self.on_back_to_artists_clicked)
 
@@ -243,19 +251,46 @@ class MainWindow(Gtk.ApplicationWindow):
                 pass
             else:
                 button = Gtk.Button(label=album_name)
+                button.set_size_request(-1, 100)
+                cover = get_cover(artist_name, album_name)
+                if cover is not None:
+                    image = Image.open(BytesIO(cover))
+                    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                    image.save(temp_file)
+                    image = Gtk.Picture.new_for_filename(temp_file.name)
+                else:
+                    print("Cover is None")
+                    image = Gtk.Image.new_from_icon_name("media-optical-symbolic")
+                    image.set_pixel_size(95)
+
+                # Create a new Gtk.Box
+                box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+
+                # Add the image and the label to the box
+                box.append(image)
+                box.append(Gtk.Label(label=album_name))
+
+                # Add the box to the button
+                button.set_child(box)
+
+                new_artist_details_box.append(button)
                 button.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
                 new_artist_details_box.append(button)
                 button.connect('clicked', self.on_album_clicked, artist_name, album_name)
+
+        # Wrap the artist details box in a scrolled window
+        scrolled_artist_details = Gtk.ScrolledWindow()
+        scrolled_artist_details.set_child(new_artist_details_box)
 
         # Remove the old artist details page from the stack
         if self.artist_details_box is not None:
             self.stack.remove(self.artist_details_box)
 
         # Add the new artist details page to the stack
-        self.stack.add_named(new_artist_details_box, "artist_details")
+        self.stack.add_named(scrolled_artist_details, "artist_details")
 
         # Update the reference to the artist details box
-        self.artist_details_box = new_artist_details_box
+        self.artist_details_box = scrolled_artist_details
 
         # Switch to the artist details page
         self.stack.set_visible_child_name("artist_details")
@@ -344,6 +379,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_visible_child_name("song_listing")
                 
     def on_song_clicked(self, button, artist_name, album_name, song_path, song_queue):
+        print(song_queue)
+        self.controls_pause_play.set_child(Gtk.Image.new_from_icon_name("media-playback-pause-symbolic"))
         play_song_vlc(artist_name, album_name, song_path, song_queue, repeat_track=False)
 
     def on_back_button_clicked(self, button):
@@ -389,13 +426,17 @@ class MainWindow(Gtk.ApplicationWindow):
         self.about.set_visible(True)
         
     def controls_stop_clicked(self, button):
+        self.controls_pause_play.set_child(Gtk.Image.new_from_icon_name("media-playback-start-symbolic"))
         player.stop()
     
     def controls_pause_play_clicked(self, button):
         if player.is_playing():
             player.pause()
+            # change icon
+            button.set_child(Gtk.Image.new_from_icon_name("media-playback-start-symbolic"))
         else:
             player.play()
+            button.set_child(Gtk.Image.new_from_icon_name("media-playback-pause-symbolic"))
 
     def __del__(self):
         # Stop mplayer

@@ -3,6 +3,7 @@ from colorama import Fore
 from config import SERVER, CAL_DIR
 from mpris2 import Player, get_players_uri
 from gi.repository import GLib
+from urllib.parse import quote
 
 def ping_server():
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
@@ -134,18 +135,26 @@ def play_song_mpris(artist_name, album_name, song, song_queue, repeat_track):
     player.Play()
 
 player = vlc.MediaPlayer()
+song_queue = []
 
-def play_song_vlc(artist_name, album_name, song, song_queue, repeat_track):
-    global player
+def play_song_vlc(artist_name_param, album_name_param, song_path_param, song_queue_param, repeat_track=False):
+    global player, song_queue, artist_name, album_name, song_path
+    song_queue = song_queue_param
+    artist_name = artist_name_param
+    album_name = album_name_param
+    song_path = song_path_param
     if player.is_playing():
         player.stop()
-    song_url = f"{SERVER}/{artist_name}/{album_name}/{song}".replace(" ", "%20")
+    song_url = f"{SERVER}/{quote(artist_name)}/{quote(album_name)}/{quote(song_path)}"
     print(Fore.BLUE + song_url + Fore.RESET)
     player.set_mrl(song_url)
     player.play()
 
 def get_cover(artist_name, album_name):
-    image_url = f"{SERVER}/{artist_name}/{album_name}/cover"
+    if album_name == "Plugins":
+        image_url = f"{SERVER}/{artist_name}/cover"
+    else:
+        image_url = f"{SERVER}/{artist_name}/{album_name}/cover"
     response = requests.get(image_url + ".png")
     if response.status_code == 200:
         cover = response.content
