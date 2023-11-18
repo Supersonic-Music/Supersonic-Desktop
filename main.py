@@ -1,8 +1,8 @@
-import requests, time
+import requests, time, tempfile, subprocess, mimetypes, os, platform, vlc
+from colorama import Fore
 from config import SERVER, CAL_DIR
-import platform    # For getting the operating system name
-import subprocess  # For executing a shell command
-import mimetypes
+from mpris2 import Player, get_players_uri
+from gi.repository import GLib
 
 def ping_server():
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
@@ -81,18 +81,68 @@ def list_stuff(list_of_stuff):
     for thing in list_of_stuff:
         print(thing["name"])
 
-def play_song(artist_name, album_name, song, song_queue):
+def play_song(artist_name, album_name, song, song_queue, repeat_track):
     player = mimetypes.mimetypes_list[song.rsplit(".", 1)[-1]]
     command = f'{player} "{SERVER}/{artist_name}/{album_name}/{song}"'
-    for songy in song_queue:
-        if songy == song:
-            pass
-        else:
-            command += f' "{SERVER}/{artist_name}/{album_name}/{songy}"'
+    if repeat_track:
+        command = command + " -loop 0"
+    else:
+        for songy in song_queue:
+            if songy == song:
+                pass
+            else:
+                command += f' "{SERVER}/{artist_name}/{album_name}/{songy}"'
     print(player)
     subprocess.run("killall mplayer", shell=True)
     subprocess.run("killall mpv", shell=True)
     subprocess.Popen(command, shell=True)
+
+def play_song_mpris(artist_name, album_name, song, song_queue, repeat_track):
+    # Download the song data
+    song_url = f"{SERVER}/{artist_name}/{album_name}/{song}"
+    response = requests.get(song_url)
+    response.raise_for_status()  # Raise an exception if the request failed
+
+    # Save the song data to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
+        temp_file.write(response.content)
+        song_path = temp_file.name
+
+    # Get the URI of the first available player
+    player_uri = next(get_players_uri(), None)
+
+    if player_uri is None:
+        print("No available player found.")
+        return
+
+    # Create a Player instance
+    player = Player(dbus_interface_info={'dbus_uri': player_uri})
+
+    # Set the metadata for the song
+    player.Metadata = {
+        'mpris:trackid': GLib.Variant('s', '/org/mpris/MediaPlayer2/Track/0'),
+        'mpris:length': GLib.Variant('x', 60 * 1e6),  # 60 seconds
+        'xesam:title': GLib.Variant('s', song),
+        'xesam:album': GLib.Variant('s', album_name),
+        'xesam:artist': GLib.Variant('as', [artist_name]),
+    }
+
+    # Set the song to play
+    player.Uri = 'file://' + song_path
+
+    # Play the song
+    player.Play()
+
+player = vlc.MediaPlayer()
+
+def play_song_vlc(artist_name, album_name, song, song_queue, repeat_track):
+    global player
+    if player.is_playing():
+        player.stop()
+    song_url = f"{SERVER}/{artist_name}/{album_name}/{song}".replace(" ", "%20")
+    print(Fore.BLUE + song_url + Fore.RESET)
+    player.set_mrl(song_url)
+    player.play()
 
 def get_cover(artist_name, album_name):
     image_url = f"{SERVER}/{artist_name}/{album_name}/cover"

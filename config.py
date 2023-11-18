@@ -2,6 +2,8 @@
 SERVER = "http://localhost:6969/music" # If not reachable, FALLBACK_SERVER will be used instead.
 FALLBACK_SERVER = "http://atomic123.pythonanywhere.com/music" # Public Server
 
+USE_BUILTIN_SERVER = True
+
 # Specify your Sonic Screwdriver CAL (Catalog of Audio Listings) folder here:
 CAL_DIR = ".cal_sonic_library"
 
