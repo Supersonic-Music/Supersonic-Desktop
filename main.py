@@ -1,4 +1,5 @@
 import requests, time, tempfile, subprocess, mimetypes, os, platform, vlc, threading
+from vlc import State
 from colorama import Fore
 from config import SERVER, CAL_DIR
 from mpris2 import Player, get_players_uri
@@ -153,9 +154,11 @@ def play_song_vlc(artist_name_param, album_name_param, song_path_param, song_que
     def check_player_status():
         while True:
             time.sleep(1)  # Wait for 1 second
-            if not player.is_playing():
-                print(f"{song_path} has finished playing.")
+            state = player.get_state()
+            if state == State.Ended:
                 break
+            elif state == State.Paused:
+                pass
         current_song_index = song_queue.index(song_path)
         new_song_queue = song_queue[current_song_index + 1:]
         print(new_song_queue)
