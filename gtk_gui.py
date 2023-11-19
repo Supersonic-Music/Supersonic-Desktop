@@ -4,7 +4,7 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw
 from PIL import Image
 from io import BytesIO
-from main import load_artists, load_artist_albums, load_album_songs, get_cover, ping_server
+from main import load_artists, load_artist_albums, load_album_songs, get_cover, ping_server, load_albums_only
 from config import PROGRAM_NAME, PROGRAM_SLOGAN, PROGRAM_VERSION, SERVER, USE_BUILTIN_SERVER
 from main import play_song, play_song_vlc, player
 
@@ -35,7 +35,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         sidebar_buttons = [
             {"name": "Artists", "icon": "avatar-default-symbolic", "action": "on_back_to_artists_clicked"}, 
-            # {"name": "Albums", "icon": "media-optical-symbolic", "action": "show_about"}, 
+            {"name": "Albums", "icon": "media-optical-symbolic", "action": "albums_view_clicked"}, 
             # {"name": "Songs", "icon": "folder-music-symbolic", "action": "show_about"}, 
             # {"name": "Decades", "icon": "emblem-synchronizing-symbolic", "action": "on_decades_clicked"}, 
             # {"name": "Playlists", "icon": "view-media-playlist-symbolic", "action": "show_about"}, 
@@ -229,6 +229,11 @@ class MainWindow(Gtk.ApplicationWindow):
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_child(self.song_listing_box)
         self.stack.add_named(scrolled_window, "song_listing")
+        
+        self.albums_view_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_child(self.albums_view_box)
+        self.stack.add_named(scrolled_window, "albums_view")
 
         back_button = Gtk.Button(label="Back")
         self.song_listing_box.append(back_button)
@@ -437,7 +442,56 @@ class MainWindow(Gtk.ApplicationWindow):
         else:
             player.play()
             button.set_child(Gtk.Image.new_from_icon_name("media-playback-pause-symbolic"))
+            
+    def albums_view_clicked(self, button):
+        albums_view_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
+        # Remove the old "albums_view" from the stack
+        old_albums_view = self.stack.get_child_by_name("albums_view")
+        if old_albums_view is not None:
+            self.stack.remove(old_albums_view)
+
+        self.stack.add_named(albums_view_box, "albums_view")  # Add the new albums_view_box to the stack
+
+        albums_list = load_albums_only()
+        for album in albums_list:
+            first_bit_of_data = True
+            for bit_of_data in album:
+                if first_bit_of_data:
+                    first_bit_of_data = False
+                    artist_name = bit_of_data['artist']
+                else:
+                    if artist_name == ".cal_sonic_library":
+                        pass
+                    else:
+                        # make a button within its own box with the label being 'bit_of_data['name']' and the icon being media-optical-symbolic
+                        button = Gtk.Button()
+                        button.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+                        # Create a label
+                        label = Gtk.Label(label=bit_of_data['name'])
+
+                        # Create an icon
+                        icon = Gtk.Image()
+                        icon.set_from_icon_name("media-optical-symbolic")
+                        icon.set_pixel_size(20)
+
+                        # Create a box to hold the icon and label
+                        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+                        box.append(icon)
+                        box.append(label)
+
+                        # Set the box as the child of the button
+                        button.set_child(box)
+
+                        # Add the button to the box
+                        albums_view_box.append(button)  # Add the button to the new albums_view_box
+
+                        # Connect the 'clicked' signal to the 'on_button_clicked' method
+                        button.connect('clicked', self.on_album_clicked, artist_name, bit_of_data['name'])
+
+        # Switch to the new albums_view_box
+        self.stack.set_visible_child_name("albums_view")        
     def __del__(self):
         # Stop mplayer
         subprocess.run("killall mplayer", shell=True)

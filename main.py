@@ -1,4 +1,4 @@
-import requests, time, tempfile, subprocess, mimetypes, os, platform, vlc
+import requests, time, tempfile, subprocess, mimetypes, os, platform, vlc, threading
 from colorama import Fore
 from config import SERVER, CAL_DIR
 from mpris2 import Player, get_players_uri
@@ -149,6 +149,21 @@ def play_song_vlc(artist_name_param, album_name_param, song_path_param, song_que
     print(Fore.BLUE + song_url + Fore.RESET)
     player.set_mrl(song_url)
     player.play()
+
+    def check_player_status():
+        while True:
+            time.sleep(1)  # Wait for 1 second
+            if not player.is_playing():
+                print(f"{song_path} has finished playing.")
+                break
+        current_song_index = song_queue.index(song_path)
+        new_song_queue = song_queue[current_song_index + 1:]
+        print(new_song_queue)
+        play_song_vlc(artist_name, album_name, new_song_queue[0], new_song_queue, repeat_track)
+        
+    # Start a new thread to check the player status
+    threading.Thread(target=check_player_status, daemon=True).start()
+    
 
 def get_cover(artist_name, album_name):
     if album_name == "Plugins":
