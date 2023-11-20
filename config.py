@@ -5,7 +5,7 @@ FALLBACK_SERVER = "http://atomic123.pythonanywhere.com/music" # Public Server
 USE_BUILTIN_SERVER = True
 
 # Specify your Sonic Screwdriver CAL (Catalog of Audio Listings) folder here:
-CAL_DIR = ".cal_sonic_library"
+CAL_DIR = ".cal"
 
 # Specify settings about the program
 PROGRAM_NAME = "Supersonic Desktop"
