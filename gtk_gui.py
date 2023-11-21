@@ -145,44 +145,45 @@ class MainWindow(Gtk.ApplicationWindow):
             for artist in artists_list:
                 artist_name = artist["name"]
                 if artist_name.startswith("."):
-                    if artist_name.endswith(".sonic"):
-                        if not found_plugins:
-                            plugins_label = Gtk.Label()
-                            plugins_label.set_text("Add-ons")
-                            self.box1.append(plugins_label)
-                        found_plugins = True
-                        plugin_name = artist_name.split(".")[1]
-                        print(f"Found {plugin_name} Add-on!")
+                    pass
+                elif artist_name.endswith(".sonic"):
+                    if not found_plugins:
+                        plugins_label = Gtk.Label()
+                        plugins_label.set_text("Add-ons")
+                        self.box1.append(plugins_label)
+                    found_plugins = True
+                    plugin_name = artist_name.split(".")[-2]
+                    print(f"Found {plugin_name} Add-on!")
 
-                        # Create a button without a label
-                        button = Gtk.Button()
+                    # Create a button without a label
+                    button = Gtk.Button()
 
-                        # Create a label
-                        label = Gtk.Label(label=plugin_name)
+                    # Create a label
+                    label = Gtk.Label(label=plugin_name)
 
-                        # Create an icon
-                        cover = get_cover(artist_name, album_name="Plugins")
-                        if cover is not None:
-                            image = Image.open(BytesIO(cover))
-                            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-                            image.save(temp_file)
-                            image = Gtk.Picture.new_for_filename(temp_file.name)
-                        else:
-                            print("Cover is None")
-                            image = Gtk.Image.new_from_icon_name("application-x-addon-symbolic")
-                            image.set_pixel_size(20)
+                    # Create an icon
+                    cover = get_cover(artist_name, album_name="Plugins")
+                    if cover is not None:
+                        image = Image.open(BytesIO(cover))
+                        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                        image.save(temp_file)
+                        image = Gtk.Picture.new_for_filename(temp_file.name)
+                    else:
+                        print("Cover is None")
+                        image = Gtk.Image.new_from_icon_name("application-x-addon-symbolic")
+                        image.set_pixel_size(20)
 
-                        # Create a box to hold the icon and label
-                        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-                        box.append(image)
-                        box.append(label)
+                    # Create a box to hold the icon and label
+                    box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+                    box.append(image)
+                    box.append(label)
 
-                        # Set the box as the child of the button
-                        button.set_child(box)
+                    # Set the box as the child of the button
+                    button.set_child(box)
 
-                        button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-                        self.box1.append(button)
-                        button.connect('clicked', self.on_button_clicked, artist_name)
+                    button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+                    self.box1.append(button)
+                    button.connect('clicked', self.on_button_clicked, artist_name)
                 else:
                     if first_artist:
                         first_artist = False
@@ -461,7 +462,7 @@ class MainWindow(Gtk.ApplicationWindow):
                     first_bit_of_data = False
                     artist_name = bit_of_data['artist']
                 else:
-                    if artist_name == ".cal_sonic_library":
+                    if artist_name.startswith("."):
                         pass
                     else:
                         # make a button within its own box with the label being 'bit_of_data['name']' and the icon being media-optical-symbolic
