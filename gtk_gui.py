@@ -142,6 +142,7 @@ class MainWindow(Gtk.ApplicationWindow):
             artists_list = load_artists()
             found_plugins = False
             first_artist = True
+            start_time = time.time()
             for artist in artists_list:
                 artist_name = artist["name"]
                 if artist_name.startswith("."):
@@ -153,7 +154,6 @@ class MainWindow(Gtk.ApplicationWindow):
                         self.box1.append(plugins_label)
                     found_plugins = True
                     plugin_name = artist_name.split(".")[-2]
-                    print(f"Found {plugin_name} Add-on!")
 
                     # Create a button without a label
                     button = Gtk.Button()
@@ -217,6 +217,7 @@ class MainWindow(Gtk.ApplicationWindow):
                     # Connect the 'clicked' signal to the 'on_button_clicked' method
                     button.connect('clicked', self.on_button_clicked, artist_name)
                     self.artist_details_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            print(f"Took {round(time.time() - start_time, 2)} seconds to put the artists on the screen")
         scrolled_artist_window = Gtk.ScrolledWindow()
         scrolled_artist_window.set_child(self.artist_details_box)
         # self.stack.add_named(scrolled_artist_window, "artist_details")
@@ -507,5 +508,5 @@ class MyApp(Adw.Application):
         self.win = MainWindow(application=app)
         self.win.present()
 
-app = MyApp(application_id="io.davros.sonic")
+app = MyApp(application_id="software.supersonic")
 app.run(sys.argv)

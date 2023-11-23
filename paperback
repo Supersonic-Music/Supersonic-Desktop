@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-/usr/bin/python /home/ethan/git/paperback/gui.py

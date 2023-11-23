@@ -1,20 +1,15 @@
 import requests, time, tempfile, subprocess, mimetypes, os, platform, vlc, threading
 from vlc import State
-from colorama import Fore
 from config import SERVER, CAL_DIR
-from mpris2 import Player, get_players_uri
 from gi.repository import GLib
 from urllib.parse import quote
 
 def ping_server():
     url = f"{SERVER}/{CAL_DIR}/meta/artists.json"
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            return True
-        else:
-            return False
-    except:
+    response = requests.get(url)
+    if response.status_code == 200:
+        return True
+    else:
         return False
 
 def load_artists():
@@ -24,7 +19,7 @@ def load_artists():
     if response.status_code == 200:
         artists_list = response.json()
         time_taken = time.time() - start_time
-        print(f"Got {len(artists_list)} artists in {round(time_taken, 2)} seconds.")
+        print(f"Took {round(time_taken, 2)} seconds to download data for {len(artists_list)} artists.")
         return artists_list
     else:
         print("Could not load artists!!!")
@@ -147,7 +142,7 @@ def play_song_vlc(artist_name_param, album_name_param, song_path_param, song_que
     if player.is_playing():
         player.stop()
     song_url = f"{SERVER}/{quote(artist_name)}/{quote(album_name)}/{quote(song_path)}"
-    print(Fore.BLUE + song_url + Fore.RESET)
+    print(song_url)
     player.set_mrl(song_url)
     player.play()
 

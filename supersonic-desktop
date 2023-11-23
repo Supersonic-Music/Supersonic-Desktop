@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+/home/ethan/git/supersonic-desktop/venv/bin/python /home/ethan/git/supersonic-desktop/gtk_gui.py
