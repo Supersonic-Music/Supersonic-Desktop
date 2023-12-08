@@ -4,9 +4,9 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw
 from PIL import Image
 from io import BytesIO
-from main import load_artists, load_artist_albums, load_album_songs, get_cover, ping_server, load_albums_only
+from utils import load_artists, load_artist_albums, load_album_songs, get_cover, ping_server, load_albums_only
 from config import PROGRAM_NAME, PROGRAM_SLOGAN, PROGRAM_VERSION, SERVER, USE_BUILTIN_SERVER
-from main import play_song, play_song_vlc, player
+from utils import play_song, play_song_vlc, player
 
 
 class MainWindow(Gtk.ApplicationWindow):
