@@ -308,7 +308,7 @@ class MainWindow(Gtk.ApplicationWindow):
             self.song_listing_box.remove(child)
         
         # Add the back button to the song_listing_box
-        if artist_name.startswith(".") and artist_name.endswith(".sonic"):
+        if artist_name.endswith(".sonic"):
             back_to_albums_label = f"Back to {artist_name.split('.')[1]}'s Categories"
         else:
             back_to_albums_label = f"Back to {artist_name}'s Albums"
