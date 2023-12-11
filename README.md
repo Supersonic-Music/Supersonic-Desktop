@@ -2,7 +2,7 @@
 
 # Supersonic Desktop
 Simple Desktop, GUI Music Client for the [Supersonic](https://github.com/yuckdevchan/sonic-screwdriver) music server, written in python.
-- Only works fully on Linux so far.
+- Cross-Platform probably
 - Supports plugins.
 - Comes with public server preconfigured.
 
