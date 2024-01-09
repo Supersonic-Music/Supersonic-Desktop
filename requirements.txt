@@ -4,3 +4,4 @@ packaging
 pillow
 mpris2
 pygobject
+python-vlc
