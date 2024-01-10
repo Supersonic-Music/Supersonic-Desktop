@@ -22,13 +22,16 @@ GENERIC_CONFIG_PATHS = [
 ]
 
 def loop_paths(paths, os_name):
-    for path in WINDOWS_CONFIG_PATHS:
+    for path in paths:
         if os.path.exists(path):
             return path
-        if os_name in ["posix", "nt"]:
-            raise OSError("OS not supported")
-        else:
-            raise FileNotFoundError("Config file could not found")
+    for path in GENERIC_CONFIG_PATHS:
+        if os.path.exists(path):
+            return path
+    if os_name not in ["posix", "nt"]:
+        raise OSError("OS not supported")
+    else:
+        raise FileNotFoundError("Config file could not found")
 
 def find_config():
     os_name = os.name()
