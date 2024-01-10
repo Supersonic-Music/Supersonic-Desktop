@@ -9,9 +9,9 @@ LINUX_CONFIG_PATHS = [
 ]
 
 WINDOWS_CONFIG_PATHS = [
-    "%APPDATA%/supersonic-desktop/config.py",
-    "%LOCALAPPDATA%/supersonic-desktop/config.py",
-    "%PROGRAMDATA%/supersonic-desktop/config.py"
+    "%APPDATA%\\supersonic-desktop\\config.py",
+    "%LOCALAPPDATA%\\supersonic-desktop\\config.py",
+    "%PROGRAMDATA%\\supersonic-desktop\\config.py"
 ]
 
 GENERIC_CONFIG_PATHS = [
