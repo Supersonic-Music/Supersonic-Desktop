@@ -15,9 +15,9 @@ WINDOWS_CONFIG_PATHS = [
 ]
 
 GENERIC_CONFIG_PATHS = [
-    "config.py", 
     "~/Library/Application Support/supersonic-desktop/config.py",
     "/Library/Application Support/supersonic-desktop/config.py",
+    "config.py", 
     "/usr/local/share/supersonic-desktop/config.py"
 ]
 
